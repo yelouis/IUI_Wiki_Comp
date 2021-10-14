@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import date
+from __future__ import annotations
 import requests
 
 @dataclass
@@ -13,8 +14,8 @@ class WikipediaArticle:
 
     def __init__(self, article_id: int):
         self.article_id = article_id     
-        init_article()
-        init_revisions()
+        self.init_article()
+        self.init_revisions()
 
     def init_article(self):
         # TODO: API call to get standard info from wikipage
