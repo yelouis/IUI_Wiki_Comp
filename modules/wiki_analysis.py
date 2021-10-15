@@ -1,6 +1,6 @@
-from dataclasses import dataclass
-from datetime import date
 from __future__ import annotations
+from dataclasses import dataclass, field
+from datetime import date
 import requests
 
 @dataclass
@@ -10,7 +10,7 @@ class WikipediaArticle:
     url: str = ""
     current_revision_id: int = -1
     parent_revision_id: int = -1
-    revisions: dict[int, WikipediaRevision] = {}
+    revisions: dict[int, WikipediaRevision] = field(default_factory=dict)
 
     def __init__(self, article_id: int):
         self.article_id = article_id     
@@ -41,8 +41,8 @@ class WikipediaRevision:
     revision_id: int
     date: date = date(1970, 1, 1)
     static_url: str = ""
-    scores: dict[str, float] = {}
-    sections: dict[str, WikipediaSection] = {}
+    scores: dict[str, float] = field(default_factory=dict)
+    sections: dict[str, WikipediaSection] = field(default_factory=dict)
     summary: WikipediaSummary = None
 
     def __init__(self, article: WikipediaArticle, revision_id: int):
@@ -69,7 +69,7 @@ class WikipediaRevision:
 class WikipediaSection:
     revision: WikipediaRevision
     section_name: str
-    scores: dict[str, float] = {}
+    scores: dict[str, float] = field(default_factory=dict)
 
     def __init__(self, revision: WikipediaRevision, section_name: str):
         self.revision = revision
@@ -80,7 +80,7 @@ class WikipediaSection:
 class WikipediaSummary(WikipediaSection):
     revision: WikipediaRevision
     section_name: str = "Summary"
-    summary_scores: dict[str, float]
+    summary_scores: dict[str, float] = field(default_factory=dict)
 
     def __init__(self, revision: WikipediaRevision):
         self.revision = revision
