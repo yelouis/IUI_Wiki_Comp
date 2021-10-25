@@ -12,7 +12,7 @@ IGNORE_TITLES = ["User:", "Talk:", "User talk:", "Wikipedia:"]
 
 class XMLDumpParser:
     xml_context: Iterable[Tuple[str, Any]]
-    bz2_dump: IO[bytes]
+    bz2_dump: Optional[IO[bytes]] = None
 
     # gets XML context for <filename>
     # decoding if it's stored as bz2
