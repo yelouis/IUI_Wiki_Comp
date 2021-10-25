@@ -6,17 +6,17 @@ import wiki_req as wr
 
 
 class WikipediaArticle:
-    pageid: int
+    id: int
     title: str = ""
     current_id: int = -1 
     parent_id: int = -1  # parent id
     ns: int = -1   # namespace
     revisions: dict[int, WikipediaRevision] = {}
 
-    def __init__(self, pageid: int = None):
-        if pageid is not None:
-            self.pageid = pageid
-            rvs, self.current_id, self.parent_id = wr.get_article_properties(self.pageid)
+    def __init__(self, id: int = None):
+        if id is not None:
+            self.id = id
+            rvs, self.current_id, self.parent_id = wr.get_article_properties(self.id)
 
             for rv in rvs:
                 self.revisions[rv] = WikipediaRevision(self, rv)
@@ -36,7 +36,7 @@ class WikipediaArticle:
 
 class WikipediaRevision:
     article: WikipediaArticle
-    id: int
+    id: int = -1
     date: date = date(1970, 1, 1)
     scores: dict[str, float] = {}
     author_name: str = ""
@@ -47,7 +47,7 @@ class WikipediaRevision:
         if article is not None:
             self.article = article
             self.id = id
-            self.date = wr.get_revision_date(id, self.article.pageid)
+            self.date = wr.get_revision_date(id, self.article.id)
 
     def get_score(self, score_name: str) -> float:
         score = self.sections.get(score_name)

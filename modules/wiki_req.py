@@ -1,5 +1,5 @@
 import requests
-from datetime import date, datetime
+from datetime import datetime
 
 url = "https://simple.wikipedia.org/w/api.php"
 user_agent = "iui-wikipedia (https://github.com/yelouis/IUI_Wiki_Comp)"
