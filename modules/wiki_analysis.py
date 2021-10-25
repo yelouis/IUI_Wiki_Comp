@@ -1,6 +1,7 @@
 from __future__ import annotations
+from typing import Optional
 from datetime import date
-#import textstat
+
 import wiki_req as wr
 
 
@@ -20,13 +21,13 @@ class WikipediaArticle:
             for rv in rvs:
                 self.revisions[rv] = WikipediaRevision(self, rv)
 
-    def get_current_revision(self) -> WikipediaRevision:
+    def get_current_revision(self) -> Optional[WikipediaRevision]:
         current_revision = self.revisions.get(self.current_id)
         if current_revision:
             return current_revision
         return None
 
-    def get_parent_revision(self) -> WikipediaRevision:
+    def get_parent_revision(self) -> Optional[WikipediaRevision]:
         parent_revision = self.revisions.get(self.parent_id)
         if parent_revision:
             return parent_revision
@@ -43,13 +44,13 @@ class WikipediaRevision:
     text: str = ""
 
     def __init__(self, article: WikipediaArticle = None, id: int = None):
-        if article is not None:
+        if article is not None and id is not None:
             self.article = article
             self.id = id
             self.date = wr.get_revision_date(id, self.article.id)
 
-    def get_score(self, score_name: str) -> float:
-        score = self.sections.get(score_name)
+    def get_score(self, score_name: str) -> Optional[float]:
+        score = self.scores.get(score_name)
         if score:
             return score
         return None
