@@ -95,7 +95,7 @@ def parse_revision(xml_context: etree, article: wa.WikipediaArticle) -> wa.Wikip
                     revision.date = datetime.strptime(elem.text, "%Y-%m-%dT%H:%M:%SZ")
 
             elif tag == "contributor":
-                revision.author_name, revision.author_id = parse_user(xml_context)
+                revision.author_name, revision.author_id = parse_author(xml_context)
 
             elif tag == "text":
                 revision.text = elem.text
