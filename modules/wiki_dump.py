@@ -67,7 +67,8 @@ def parse_page(xml_context: Iterable[Tuple[str, Any]]) -> Optional[wa.WikipediaA
 
             elif tag == "revision":
                 revision = parse_revision(xml_context, article)
-                article.revisions[revision.id] = revision 
+                if revision:
+                    article.revisions[revision.id] = revision 
 
         elif tag == "page" and event == "end":
             return article
