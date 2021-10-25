@@ -39,8 +39,6 @@ class WikipediaRevision:
     id: int
     date: date = date(1970, 1, 1)
     scores: dict[str, float] = {}
-    sections: dict[str, WikipediaSection] = {}
-    summary: WikipediaSummary = None
     author_name: str = ""
     author_id: int = -1
     text: str = ""
@@ -55,18 +53,6 @@ class WikipediaRevision:
         score = self.sections.get(score_name)
         if score:
             return score
-        return None
-
-    def get_section(self, section_name: str) -> WikipediaSection:
-        section = self.sections.get(section_name)
-        if section:
-            return section
-        return None
-
-    def get_summary(self) -> WikipediaSummary:
-        summary = self.sections.get("Summary")
-        if summary:
-            return summary
         return None
 
     def author_metrics(self, id):
