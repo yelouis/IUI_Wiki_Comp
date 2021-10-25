@@ -7,16 +7,28 @@ import wiki_analysis as wa
 
 NUM_ARTICLES = 100
 
-# opens <filename> as bz2, decodes bz2 into xml, 
-# creates xml iterator, iterates xml until it finds a page tag
+# opens <filename> as bz2, decodes bz2 into xml,
+# and creates an xml iterator, calls parse_wiki_xml
 def load_from_bz2(filename: str, n: int = NUM_ARTICLES):
-    articles = {}
-
     with bz2.BZ2File(filename, 'rb') as bz2_dump:
 
         xml_context = etree.iterparse(bz2_dump, events=('start', 'end'))
 
-        for event, elem in xml_context:
+        return parse_wiki_xml(xml_context, n)
+
+# opens <filename> as xml, and creates an xml iterator, 
+# calls parse_wiki_xml
+def load_from_xml(filename: str, n: int = NUM_ARTICLES):
+    xml_context = etree.iterparse(filename, events=('start', 'end'))
+    
+    return parse_wiki_xml(xml_context, n)
+
+# iterates xml until it finds a page tag
+# SIDE EFFECT: iterates xml_context
+def parse_wiki_xml(xml_context: etree, n: int):
+    articles = {}
+
+    for event, elem in xml_context:
             tag = elem.tag.split("}")[1]
 
             if event == "start" and tag == "page":
@@ -25,24 +37,6 @@ def load_from_bz2(filename: str, n: int = NUM_ARTICLES):
 
             if len(articles) == n:
                 return articles
-
-# opens <filename> as xml, creates xml iterator, 
-# iterates xml until it finds a page tag
-# SIDE EFFECT: iterates xml_context
-def load_from_xml(filename: str, n: int = NUM_ARTICLES):
-    articles = []
-
-    xml_context = etree.iterparse(filename, events=('start', 'end'))
-
-    for event, elem in xml_context:
-        tag = elem.tag.split("}")[1]
-
-        if event == "start" and tag == "page":
-                article = parse_page(xml_context)
-                articles.append(article)
-
-        if len(articles) == n:
-            return articles
 
 # continues xml_context and parses a single <page> tag
 # if it encounters a <revision> tag, calls parse_revision()
