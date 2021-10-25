@@ -59,7 +59,7 @@ def parse_page(xml_context: etree) -> wa.WikipediaArticle:
                 if elem.text: article.ns = int(elem.text)
 
             elif tag == "id":
-                if elem.text: article.pageid = int(elem.text)
+                if elem.text: article.id = int(elem.text)
 
             elif tag == "revision":
                 revision = parse_revision(xml_context, article)
@@ -83,12 +83,12 @@ def parse_revision(xml_context: etree, article: wa.WikipediaArticle) -> wa.Wikip
                     revision.id = int(elem.text)
                 if len(article.revisions) == 0:
                     # first revision -> newest
-                    article.cid = revision.id
+                    article.current_id = revision.id
 
             elif tag == "parentid":
-                if len(article.revisions) == 0:
+                if len(article.revisions) == 0 and elem.text:
                     # first revision -> newest
-                    article.cid = revision.id
+                    article.parent_id = int(elem.text)
 
             elif tag == "timestamp":
                 if elem.text:
@@ -119,3 +119,14 @@ def parse_author(xml_context: etree):
 
         elif tag == "contributor" and event == "end":
             return username, id
+
+def main():
+    DUMP_FILE = '../dumps/simplewiki-20211001-pages-meta-current.xml.bz2'
+
+    articles = load_from_bz2(DUMP_FILE, 10)
+
+    print([a.title for a in articles.values()])
+
+
+if __name__ == "__main__":
+    main()

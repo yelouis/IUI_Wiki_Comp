@@ -1,12 +1,11 @@
 from __future__ import annotations
-from dataclasses import dataclass, field
 from datetime import date
 #import textstat
 import wiki_req as wr
 
 
 class WikipediaArticle:
-    id: int
+    id: int = -1
     title: str = ""
     current_id: int = -1 
     parent_id: int = -1  # parent id

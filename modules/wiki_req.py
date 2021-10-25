@@ -1,6 +1,8 @@
 import requests
 from datetime import datetime
 
+import wiki_analysis as wa
+
 url = "https://simple.wikipedia.org/w/api.php"
 user_agent = "iui-wikipedia (https://github.com/yelouis/IUI_Wiki_Comp)"
 query_base = query_params = {
@@ -132,3 +134,9 @@ def get_contributors(pageid, admin=False):
     contribs = request['query']['pages'][str(pageid)]['contributors']
 
     return contribs
+
+def main():
+    tester = wa.WikipediaArticle(17338)
+
+if __name__ == "__main__":
+    main()
