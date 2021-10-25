@@ -2,32 +2,33 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import date
 #import textstat
-import wikireq as wr
+import wiki_req as wr
 
 
 class WikipediaArticle:
-    article_id: int
-    name: str = ""
-    url: str = ""
-    cid: int = -1  # current id
-    pid: int = -1  # parent id
+    pageid: int
+    title: str = ""
+    current_id: int = -1 
+    parent_id: int = -1  # parent id
+    ns: int = -1   # namespace
     revisions: dict[int, WikipediaRevision] = {}
 
-    def __init__(self, article_id: int):
-        self.article_id = article_id
-        rvs, self.cid, self.pid = wr.get_article_properties(self.article_id)
+    def __init__(self, pageid: int = None):
+        if pageid is not None:
+            self.pageid = pageid
+            rvs, self.current_id, self.parent_id = wr.get_article_properties(self.pageid)
 
-        for rv in rvs:
-            self.revisions[rv] = WikipediaRevision(self, rv)
+            for rv in rvs:
+                self.revisions[rv] = WikipediaRevision(self, rv)
 
     def get_current_revision(self) -> WikipediaRevision:
-        current_revision = self.revisions.get(self.current_revision_id)
+        current_revision = self.revisions.get(self.current_id)
         if current_revision:
             return current_revision
         return None
 
     def get_parent_revision(self) -> WikipediaRevision:
-        parent_revision = self.revisions.get(self.parent_revision_id)
+        parent_revision = self.revisions.get(self.parent_id)
         if parent_revision:
             return parent_revision
         return None
@@ -35,19 +36,20 @@ class WikipediaArticle:
 
 class WikipediaRevision:
     article: WikipediaArticle
-    revision_id: int
+    id: int
     date: date = date(1970, 1, 1)
-    static_url: str = ""
     scores: dict[str, float] = {}
     sections: dict[str, WikipediaSection] = {}
     summary: WikipediaSummary = None
+    author_name: str = ""
+    author_id: int = -1
+    text: str = ""
 
-    def __init__(self, article: WikipediaArticle, revision_id: int):
-        self.article = article
-        self.revision_id = revision_id
-        self.date = wr.get_revision_date(revision_id, self.article.article_id)
-
-        return None
+    def __init__(self, article: WikipediaArticle = None, id: int = None):
+        if article is not None:
+            self.article = article
+            self.id = id
+            self.date = wr.get_revision_date(id, self.article.pageid)
 
     def get_score(self, score_name: str) -> float:
         score = self.sections.get(score_name)
@@ -96,24 +98,3 @@ class WikipediaRevision:
         # not sure if take in text or the id
         avgSentenceLength = self.ASL(text)
         pass
-
-
-class WikipediaSection:
-    revision: WikipediaRevision
-    section_name: str
-    scores: dict[str, float] = field(default_factory=dict)
-
-    def __init__(self, revision: WikipediaRevision, section_name: str):
-        self.revision = revision
-        self.section_name = section_name
-        # TODO: init all scores
-
-
-class WikipediaSummary(WikipediaSection):
-    revision: WikipediaRevision
-    section_name: str = "Summary"
-    summary_scores: dict[str, float] = field(default_factory=dict)
-
-    def __init__(self, revision: WikipediaRevision):
-        self.revision = revision
-        # TODO: init all scores
