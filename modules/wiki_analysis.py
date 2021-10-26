@@ -12,6 +12,7 @@ class WikipediaArticle:
     parent_id: int = -1  # parent id
     ns: int = -1   # namespace
     revisions: dict[int, WikipediaRevision]
+    notext: int = 0 # number of revisions with no text
 
     def __init__(self, id: int = None):
         self.revisions = {}
@@ -21,6 +22,9 @@ class WikipediaArticle:
 
             for rv in rvs:
                 self.revisions[rv] = WikipediaRevision(self, rv)
+
+    def __repr__(self):
+        return f"Article(id={self.id}, title={self.title}, num_revisions={len(self.revisions)}, num_notext={self.notext})"
 
     def get_current_revision(self) -> Optional[WikipediaRevision]:
         current_revision = self.revisions.get(self.current_id)

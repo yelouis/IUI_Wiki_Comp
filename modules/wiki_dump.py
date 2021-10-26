@@ -8,6 +8,8 @@ import xml.etree.ElementTree as etree
 import wiki_analysis as wa
 
 NUM_ARTICLES = 100
+INCLUDE_NO_TEXT = False
+PRINT_PROGRESS = False
 
 class XMLDumpParser:
     xml_context: Iterable[Tuple[str, Any]]
@@ -52,7 +54,7 @@ class XMLDumpParser:
                 article = self._parse_page()
                 if article:
                     articles[article.id] = article
-                    if n > 10 and (len(articles) % int(n / 10)) == 0:
+                    if PRINT_PROGRESS and n >= 10 and (len(articles) % int(n / 10)) == 0:
                         print(f"== {len(articles)} processed ==")
 
             if len(articles) == n:
@@ -75,6 +77,7 @@ class XMLDumpParser:
                         if int(elem.text) == 0: 
                             article.ns = int(elem.text)
                         else:
+                            self._iterate_to_page_end()
                             return None
 
                 elif tag == "id":
@@ -93,7 +96,7 @@ class XMLDumpParser:
     # continues xml_context and parses the remainder
     # of a <page> tag, ignoring all the data
     # SIDE EFFECT: iterates xml_context
-    def iterate_to_page_end(self):
+    def _iterate_to_page_end(self):
         for event, elem in self.xml_context:
             tag = elem.tag.split("}")[1]
             if tag == "page" and event == "end":
@@ -130,12 +133,29 @@ class XMLDumpParser:
                     revision.author_name, revision.author_id = self._parse_author()
 
                 elif tag == "text":
+                    if not elem.text:
+                        article.notext += 1
+                        if not INCLUDE_NO_TEXT:
+                            self._iterate_to_revision_end()
+                            return None
+
                     revision.text = elem.text
 
             elif tag == "revision" and event == "end":
                 return revision
         
         return None
+
+    # continues xml_context and parses the remainder
+    # of a <revision> tag, ignoring all the data
+    # SIDE EFFECT: iterates xml_context
+    def _iterate_to_revision_end(self):
+        for event, elem in self.xml_context:
+            tag = elem.tag.split("}")[1]
+            if tag == "revision" and event == "end":
+                return True
+        
+        return False
 
     # continues xml context and parses a single <contributor> tag
     # SIDE EFFECT: iterates xml_context
@@ -163,7 +183,7 @@ def main():
 
     articles = parser.parse_n_pages(10)
 
-    print([len(article.revisions) for article in articles.values()])
+    print([str(a) for a in articles.values()])
 
 
 if __name__ == "__main__":
