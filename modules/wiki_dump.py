@@ -8,7 +8,6 @@ import xml.etree.ElementTree as etree
 import wiki_analysis as wa
 
 NUM_ARTICLES = 100
-IGNORE_TITLES = ["User:", "Talk:", "User talk:", "Wikipedia:"]
 
 class XMLDumpParser:
     xml_context: Iterable[Tuple[str, Any]]
@@ -22,6 +21,8 @@ class XMLDumpParser:
             self.xml_context = etree.iterparse(self.bz2_dump, events=('start', 'end'))
         elif filename[-3:] == "xml":
             self.xml_context = etree.iterparse(filename, events=('start', 'end'))
+        else:
+            print(f"Unknown file encoding for {filename}")
 
     def cleanup(self):
         if self.bz2_dump is not None:
@@ -51,6 +52,8 @@ class XMLDumpParser:
                 article = self._parse_page()
                 if article:
                     articles[article.id] = article
+                    if n > 10 and (len(articles) % int(n / 10)) == 0:
+                        print(f"== {len(articles)} processed ==")
 
             if len(articles) == n:
                 return articles
@@ -64,15 +67,15 @@ class XMLDumpParser:
             tag = elem.tag.split("}")[1]
             if event == "start":
                 if tag == "title":
-                    # ignore certain pages (i.e. user pages / talk pages)
-                    for it in IGNORE_TITLES:
-                        if str(elem.text).startswith(it):
-                            self.iterate_to_page_end()
-                            return None
                     article.title = elem.text
 
                 elif tag == "ns":
-                    if elem.text: article.ns = int(elem.text)
+                    if elem.text:
+                        # if namespace is 0, then it's a normal article
+                        if int(elem.text) == 0: 
+                            article.ns = int(elem.text)
+                        else:
+                            return None
 
                 elif tag == "id":
                     if elem.text: article.id = int(elem.text)
@@ -103,7 +106,6 @@ class XMLDumpParser:
     # SIDE EFFECT: iterates xml_context
     def _parse_revision(self, article: wa.WikipediaArticle) -> Optional[wa.WikipediaRevision]:
         revision = wa.WikipediaRevision()
-        revision.article = article
         
         for event, elem in self.xml_context:
             tag = elem.tag.split("}")[1]
@@ -155,17 +157,14 @@ class XMLDumpParser:
         return username, id
 
 def main():
-    DUMP_FILE = '../dumps/simplewiki-20211001-pages-meta-current.xml.bz2'
+    DUMP_FILE = '../dumps/simplewiki-latest-pages-meta-history.xml.bz2'
 
     parser = XMLDumpParser(DUMP_FILE)
 
-    article = parser.parse_single_page()
+    articles = parser.parse_n_pages(10)
 
-    print(article.title)
+    print([len(article.revisions) for article in articles.values()])
 
-    articles = parser.parse_n_pages(100)
-
-    print([article.title for article in articles.values()])
 
 if __name__ == "__main__":
     main()

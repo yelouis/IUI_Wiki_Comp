@@ -11,9 +11,10 @@ class WikipediaArticle:
     current_id: int = -1 
     parent_id: int = -1  # parent id
     ns: int = -1   # namespace
-    revisions: dict[int, WikipediaRevision] = {}
+    revisions: dict[int, WikipediaRevision]
 
     def __init__(self, id: int = None):
+        self.revisions = {}
         if id is not None:
             self.id = id
             rvs, self.current_id, self.parent_id = wr.get_article_properties(self.id)
@@ -35,15 +36,15 @@ class WikipediaArticle:
 
 
 class WikipediaRevision:
-    article: WikipediaArticle
     id: int = -1
     date: date = date(1970, 1, 1)
-    scores: dict[str, float] = {}
+    scores: dict[str, float]
     author_name: str = ""
     author_id: int = -1
     text: str = ""
 
     def __init__(self, article: WikipediaArticle = None, id: int = None):
+        self.scores = {}
         if article is not None and id is not None:
             self.article = article
             self.id = id
