@@ -17,7 +17,7 @@ class XMLDumpParser:
 
     # gets XML context for <filename>
     # decoding if it's stored as bz2
-    def __init__(self, filename):
+    def __init__(self, filename: str):
         if filename[-3:] == "bz2":
             self.bz2_dump = bz2.BZ2File(filename, 'rb')
             self.xml_context = etree.iterparse(self.bz2_dump, events=('start', 'end'))
@@ -29,6 +29,24 @@ class XMLDumpParser:
     def cleanup(self):
         if self.bz2_dump is not None:
             self.bz2_dump.close()
+
+    def write_n_pages_to_csv(self, filename: str, r_folder: str, n: int) -> bool:
+        articles = self.parse_n_pages(n)
+        try:
+            with open(filename, 'w') as out:
+                out.write("pageId, name, currentId, parentId, numRevisions, numNoText")
+                for a in articles.values():
+                    out.write(str(a))
+                    r_fname = r_folder + f"{a.id}_revisions.csv"
+                    with open(r_fname, 'w') as r_out:
+                        for r in a.revisions.values():
+                            r_out.write(str(r))
+
+            return True
+        except Exception as e:
+            print(e)
+            print("Error creating file.")
+            return False
 
     # iterates the XML context once from <page>
     # to </page> producing a single article object
@@ -130,7 +148,12 @@ class XMLDumpParser:
                         revision.date = datetime.strptime(elem.text, "%Y-%m-%dT%H:%M:%SZ")
 
                 elif tag == "contributor":
-                    revision.author_name, revision.author_id = self._parse_author()
+                    a_name, a_id = self._parse_author()
+                    if a_name:
+                        revision.author_name = a_name
+                    
+                    if a_id:
+                        revision.author_id = a_id
 
                 elif tag == "text":
                     if not elem.text:
@@ -181,9 +204,7 @@ def main():
 
     parser = XMLDumpParser(DUMP_FILE)
 
-    articles = parser.parse_n_pages(10)
-
-    print([str(a) for a in articles.values()])
+    parser.write_n_pages_to_csv("test.csv", "", 10)
 
 
 if __name__ == "__main__":
