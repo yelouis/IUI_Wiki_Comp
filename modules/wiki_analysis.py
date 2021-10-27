@@ -7,7 +7,7 @@ import wiki_req as wr
 
 class WikipediaArticle:
     id: int = -1
-    title: str = ""
+    title: str = "N/A"
     current_id: int = -1 
     parent_id: int = -1  # parent id
     ns: int = -1   # namespace
@@ -26,6 +26,9 @@ class WikipediaArticle:
     def __repr__(self):
         return f"Article(id={self.id}, title={self.title}, num_revisions={len(self.revisions)}, num_notext={self.notext})"
 
+    def __str__(self):
+        return f"{self.id}, {self.title}, {self.current_id}, {self.parent_id}, {len(self.revisions)}, {self.notext},\n"
+
     def get_current_revision(self) -> Optional[WikipediaRevision]:
         current_revision = self.revisions.get(self.current_id)
         if current_revision:
@@ -43,9 +46,9 @@ class WikipediaRevision:
     id: int = -1
     date: date = date(1970, 1, 1)
     scores: dict[str, float]
-    author_name: str = ""
+    author_name: str = "N/A"
     author_id: int = -1
-    text: str = ""
+    text: str = "N/A"
 
     def __init__(self, article: WikipediaArticle = None, id: int = None):
         self.scores = {}
@@ -53,6 +56,10 @@ class WikipediaRevision:
             self.article = article
             self.id = id
             self.date = wr.get_revision_date(id, self.article.id)
+
+    def __str__(self):
+        # TODO: Add self.text to the end, add all the scores to the end
+        return f"{self.id}, {self.date}, {self.author_name}, {self.author_id},\n"
 
     def get_score(self, score_name: str) -> Optional[float]:
         score = self.scores.get(score_name)
