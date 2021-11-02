@@ -16,7 +16,7 @@ CATEGORY_REGEX = "Category:"
 LINK_REGEX = "((http|https)?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)"
 
 A_SCORES = ["num_edits", "num_unique_authors", "author_diversity", "age", "currency"]
-R_SCORES = ["num_internal_links", "num_external_links", "num_images", "flesch", "kincaid"]
+R_SCORES = ["num_internal_links", "num_external_links", "num_images", "flesch", "kincaid", "average_sentence_length"]
 
 class WikipediaArticle:
     id: int = -1
@@ -141,6 +141,7 @@ class WikipediaRevision:
         if self.text != "N/A":
             self.scores["flesch"] = textstat.flesch_reading_ease(self.text)
             self.scores["kincaid"] = textstat.flesch_kincaid_grade(self.text)
+            self.scores["average_sentence_length"] = textstat.avg_sentence_length(self.text)
         
         # textstat.smog_index(test_data)
         # textstat.coleman_liau_index(test_data)

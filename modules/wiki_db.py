@@ -1,89 +1,106 @@
 import psycopg2
+from typing import Optional
 
 import wiki_dump as wd
 
-try:
-    conn = psycopg2.connect("dbname='wikipedia' user='mathcsadmin' host='127.0.0.1' password='corgiPower!'")
-except:
-    print("I am unable to connect to the database")
+class DatabaseAccess:
+	conn: Optional[psycopg2.connection] = None
+	cursors: Optional[psycopg2.cursor] = None
 
-cur = conn.cursor()
-
-wiki_dump = wd.XMLDumpParser("../dumps/simplewiki-latest-pages-meta-history.xml.bz2")
-
-amount = 10
-inserts = wiki_dump.parse_n_pages(amount)
-
-while len(inserts) > 0:
-	for article in inserts.values():
+	def __init__(self):
 		try:
-			cur.execute(f"""INSERT INTO public."article" VALUES ({article.id}, '{article.title}', {article.current_id})""")
+			self.conn = psycopg2.connect("dbname='wikipedia' user='mathcsadmin' host='127.0.0.1' password='corgiPower!'")
+			self.cursor = self.conn.cursor()
 		except:
-			print("pageID already exists")
-		for revision in article.revisions:
-			articleText = article.revisions[revision].text
-			# compressedArtText = zlib.compress(articleText.encode())
-			flesch = article.revisions[revision].get_score("flesch")
-			try:
-				cur.execute(f"""INSERT INTO public."revisionHistory" VALUES (
-					{article.revisions[revision].id},
-					'{article.title}',
-					TIMESTAMP '{article.revisions[revision].date}',
-					-1, -1, -1, -1, -1, -1,
-					{len(articleText)},
-					-1, -1, -1, -1, -1, {article.id}, $${articleText}$$) """)
-			except:
-				print("row already exists")
-	conn.commit()
+			print("Connection failed.")
+
+
+def main():
+	try:
+		conn = psycopg2.connect("dbname='wikipedia' user='mathcsadmin' host='127.0.0.1' password='corgiPower!'")
+	except:
+		print("I am unable to connect to the database")
+
+	cur = conn.cursor()
+
+	wiki_dump = wd.XMLDumpParser("../dumps/simplewiki-latest-pages-meta-history.xml.bz2")
+
+	amount = 10
 	inserts = wiki_dump.parse_n_pages(amount)
 
-
-# for article in inserts.values():
-#     try:
-#         cur.execute(f"""INSERT INTO public."article" VALUES ({article.id}, '{article.title}', {article.current_id})""")
-#     except:
-#         print("pageID already exists")
-
-    # for revision in article.revisions:
-    # 	try:
-	   #      cur.execute(f"""INSERT INTO public."revisionHistory" VALUES (
-	   #      	{revision.id}, 
-	   #      	'{revision.title}', 
-	   #      	{revision.date}, 
-	   #      	{revision.author_metrics(revision.id)},
-	   #      	{revision.num_edits}, 
-	   #      	{revision.num_edits_regis}, 
-	   #      	{revision.num_edits_anom}, 
-	   #      	{revision.internal_links(revision.id)}, 
-	   #      	{revision.external_links(revision.id)}, 
-	   #      	{len(revision.text)}, 
-	   #      	{revision.author_metrics(revision.id)}, 
-	   #      	{revision.admin_edits_prop},
-	   #      	{revision.article_age(revision.id)},
-	   #      	{article.revisions.values().index(revision)},
-	   #      	{revision.mean_revision_time},
-	   #      	{article.id}, )""")
-	   #      # info we cannot get yet:
-	   #      # title
-	   #      # num_edits
-	   #      # num_edits_regis
-	   #      # num_edits_anom
-	   #      # art_length - depending on what this is asking. Right now I am just getting text length
-	   #      # author_diversity - this comes from author_metrics(revision.id)? What is the return type of this function?
-	   #      # admin_edits_prop
-	   #      # mean_revision_time
-	   #  except:
-	   #      print("id already exists")
-
-conn.commit()
+	while len(inserts) > 0:
+		for article in inserts.values():
+			try:
+				cur.execute(f"""INSERT INTO public."article" VALUES ({article.id}, '{article.title}', {article.current_id})""")
+			except:
+				print("pageID already exists")
+			for revision in article.revisions:
+				articleText = article.revisions[revision].text
+				# compressedArtText = zlib.compress(articleText.encode())
+				flesch = article.revisions[revision].get_score("flesch")
+				try:
+					cur.execute(f"""INSERT INTO public."revisionHistory" VALUES (
+						{article.revisions[revision].id},
+						'{article.title}',
+						TIMESTAMP '{article.revisions[revision].date}',
+						-1, -1, -1, -1, -1, -1,
+						{len(articleText)},
+						-1, -1, -1, -1, -1, {article.id}, $${articleText}$$) """)
+				except:
+					print("row already exists")
+		conn.commit()
+		inserts = wiki_dump.parse_n_pages(amount)
 
 
-# inserts = wiki_dump.parse_n_pages(amount)
-#
-# for article in inserts.values():
-#     cur.execute(f"""INSERT INTO public."article" VALUES ({article.id}, '{article.title}', {article.current_id})""")
-# conn.commit()
-# cur.execute("""SELECT * FROM public.article""")
+	# for article in inserts.values():
+	#     try:
+	#         cur.execute(f"""INSERT INTO public."article" VALUES ({article.id}, '{article.title}', {article.current_id})""")
+	#     except:
+	#         print("pageID already exists")
 
-# rows = cur.fetchall()
-# print(rows)
+		# for revision in article.revisions:
+		# 	try:
+		#      cur.execute(f"""INSERT INTO public."revisionHistory" VALUES (
+		#      	{revision.id}, 
+		#      	'{revision.title}', 
+		#      	{revision.date}, 
+		#      	{revision.author_metrics(revision.id)},
+		#      	{revision.num_edits}, 
+		#      	{revision.num_edits_regis}, 
+		#      	{revision.num_edits_anom}, 
+		#      	{revision.internal_links(revision.id)}, 
+		#      	{revision.external_links(revision.id)}, 
+		#      	{len(revision.text)}, 
+		#      	{revision.author_metrics(revision.id)}, 
+		#      	{revision.admin_edits_prop},
+		#      	{revision.article_age(revision.id)},
+		#      	{article.revisions.values().index(revision)},
+		#      	{revision.mean_revision_time},
+		#      	{article.id}, )""")
+		#      # info we cannot get yet:
+		#      # title
+		#      # num_edits
+		#      # num_edits_regis
+		#      # num_edits_anom
+		#      # art_length - depending on what this is asking. Right now I am just getting text length
+		#      # author_diversity - this comes from author_metrics(revision.id)? What is the return type of this function?
+		#      # admin_edits_prop
+		#      # mean_revision_time
+		#  except:
+		#      print("id already exists")
+
+	conn.commit()
+
+
+	# inserts = wiki_dump.parse_n_pages(amount)
+	#
+	# for article in inserts.values():
+	#     cur.execute(f"""INSERT INTO public."article" VALUES ({article.id}, '{article.title}', {article.current_id})""")
+	# conn.commit()
+	# cur.execute("""SELECT * FROM public.article""")
+
+	# rows = cur.fetchall()
+	# print(rows)
+
+if __name__=="__main__":
+	main()
