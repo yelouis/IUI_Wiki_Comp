@@ -1,4 +1,5 @@
 import psycopg2
+import zlib
 
 import wiki_dump as wd
 
@@ -11,14 +12,37 @@ cur = conn.cursor()
 
 wiki_dump = wd.XMLDumpParser("../dumps/simplewiki-latest-pages-meta-history.xml.bz2")
 
-amount = 11
+amount = 10
 inserts = wiki_dump.parse_n_pages(amount)
 
-for article in inserts.values():
-    try:
-        cur.execute(f"""INSERT INTO public."article" VALUES ({article.id}, '{article.title}', {article.current_id})""")
-    except:
-        print("pageID already exists")
+while len(inserts) > 0:
+	for article in inserts.values():
+		try:
+			cur.execute(f"""INSERT INTO public."article" VALUES ({article.id}, '{article.title}', {article.current_id})""")
+		except:
+			print("pageID already exists")
+		for revision in article.revisions:
+			articleText = article.revisions[revision].text
+			# compressedArtText = zlib.compress(articleText.encode())
+			try:
+				cur.execute(f"""INSERT INTO public."revisionHistory" VALUES (
+					{article.revisions[revision].current_id},
+					'{article.title}',
+					TIMESTAMP '{article.revisions[revision].date}',
+					-1, -1, -1, -1, -1, -1,
+					{len(articleText)},
+					-1, -1, -1, -1, -1, {article.id}, $${articleText}$$) """)
+			except:
+				print("row already exists")
+	conn.commit()
+	inserts = wiki_dump.parse_n_pages(amount)
+
+
+# for article in inserts.values():
+#     try:
+#         cur.execute(f"""INSERT INTO public."article" VALUES ({article.id}, '{article.title}', {article.current_id})""")
+#     except:
+#         print("pageID already exists")
 
     # for revision in article.revisions:
     # 	try:
@@ -59,7 +83,7 @@ conn.commit()
 # for article in inserts.values():
 #     cur.execute(f"""INSERT INTO public."article" VALUES ({article.id}, '{article.title}', {article.current_id})""")
 # conn.commit()
-cur.execute("""SELECT * FROM public.article""")
+# cur.execute("""SELECT * FROM public.article""")
 
-rows = cur.fetchall()
-print(rows)
+# rows = cur.fetchall()
+# print(rows)

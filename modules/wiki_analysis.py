@@ -17,7 +17,7 @@ LINK_REGEX = "((http|https)?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)"
 class WikipediaArticle:
     id: int = -1
     title: str = "N/A"
-    current_id: int = -1 
+    current_id: int = -1
     parent_id: int = -1  # parent id
     ns: int = -1   # namespace
     revisions: dict[int, WikipediaRevision]
