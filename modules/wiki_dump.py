@@ -209,6 +209,7 @@ def main():
         a.calculate_scores()
         for r in a.revisions.values():
             print(r.scores)
+        print(repr(a))
         print(a.scores)
 
 
