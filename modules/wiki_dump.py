@@ -92,7 +92,7 @@ class XMLDumpParser:
                 elif tag == "ns":
                     if elem.text:
                         # if namespace is 0, then it's a normal article
-                        if int(elem.text) == 0: 
+                        if int(elem.text) == 0:
                             article.ns = int(elem.text)
                         else:
                             self._iterate_to_page_end()
@@ -104,7 +104,7 @@ class XMLDumpParser:
                 elif tag == "revision":
                     revision = self._parse_revision(article)
                     if revision:
-                        article.revisions[revision.id] = revision 
+                        article.revisions[revision.id] = revision
 
             elif tag == "page" and event == "end":
                 return article
@@ -119,7 +119,7 @@ class XMLDumpParser:
             tag = elem.tag.split("}")[1]
             if tag == "page" and event == "end":
                 return True
-        
+
         return False
 
     # continues xml_context and parses a single <revision> tag
@@ -127,7 +127,7 @@ class XMLDumpParser:
     # SIDE EFFECT: iterates xml_context
     def _parse_revision(self, article: wa.WikipediaArticle) -> Optional[wa.WikipediaRevision]:
         revision = wa.WikipediaRevision()
-        
+
         for event, elem in self.xml_context:
             tag = elem.tag.split("}")[1]
             if event == "start":
@@ -151,7 +151,7 @@ class XMLDumpParser:
                     a_name, a_id = self._parse_author()
                     if a_name:
                         revision.author_name = a_name
-                    
+
                     if a_id:
                         revision.author_id = a_id
 
@@ -166,7 +166,7 @@ class XMLDumpParser:
 
             elif tag == "revision" and event == "end":
                 return revision
-        
+
         return None
 
     # continues xml_context and parses the remainder
@@ -177,7 +177,7 @@ class XMLDumpParser:
             tag = elem.tag.split("}")[1]
             if tag == "revision" and event == "end":
                 return True
-        
+
         return False
 
     # continues xml context and parses a single <contributor> tag
@@ -196,7 +196,7 @@ class XMLDumpParser:
 
             elif tag == "contributor" and event == "end":
                 return username, id
-        
+
         return username, id
 
 def main():
@@ -204,7 +204,9 @@ def main():
 
     parser = XMLDumpParser(DUMP_FILE)
 
-    parser.write_n_pages_to_csv("test.csv", "", 10)
+    print(parser.parse_n_pages(3))
+
+    # parser.write_n_pages_to_csv("test.csv", "", 10)
 
 
 if __name__ == "__main__":
