@@ -1,0 +1,45 @@
+[[Image:Kawasaki-Electric Fan.jpg|thumb|A [[wikt:fan|fan]] is used to move air.]]
+
+'''Air''' refers to the [[Earth]]'s [[atmosphere]]. Air is a [[mixture]] of many gases and tiny dust particles. It is the clear [[gas]] in which living things live and [[breathe]]. It has an indefinite shape and volume. It has [[mass]] and [[weight]], because it is [[matter]]. The weight of air creates [[atmosphere pressure|atmospheric  pressure]]. There is no air in [[outer space]]. 
+
+Air is a [[mixture]] of about 78% of [[nitrogen]], 21% of [[oxygen]], 0.9% of [[argon]], 0.04% of [[carbon dioxide]], and very small amounts of other gases.<ref>{{citeweb|url=http://mistupid.com/chemistry/aircomp.htm|title=composition of air}}</ref><ref>Zimmer, Carl (3 October 2013). Earth’s Oxygen: a mystery easy to take for granted. New York Times. [https://www.nytimes.com/2013/10/03/science/earths-oxygen-a-mystery-easy-to-take-for-granted.html?_r=0]</ref>  There is an average of about 1% water vapour.
+
+Animals live and need to breathe the oxygen in the air. In [[breathing]], the [[lung]]s put oxygen into the [[blood]], and send back [[carbon dioxide]] to the air. Plants need the carbon dioxide in the air to live. They give off the oxygen that we breathe. Without it we die of [[asphyxia]].  
+
+[[Wind]] is moving air, this is refreshing. This causes [[weather]]. 
+
+Air can be [[air pollution|polluted]] by some gases (such as [[carbon monoxide]], hydrocarbons, and nitrogen oxides), [[smoke]], and ash. This [[air pollution]] causes various problems including [[smog]], [[acid rain]] and [[global warming]]. It can damage people's [[health]] and the environment. 
+
+Since early times, air has been used to create [[technology]]. Ships moved with sails and windmills used the mechanical motion of air. Aircraft use [[propeller]]s to move air over a [[wing]], which allows them to [[flight|fly]]. [[Pneumatics]] use [[air pressure]] to move things. Since the late 1900s, air power is also used to generate electricity. 
+
+Air is invisible: it cannot be seen by the eye, though a shimmering in hot air can be seen.<ref>https://www.sciencefocus.com/planet-earth/why-is-air-invisible/</ref>
+
+Air is one of the four classical elements in Greek theory. It was considered an intervening element, somewhere between fire and water, and the driving force for the birth of the cosmos.
+
+== Brief history ==
+Earth's atmosphere has changed much since its formation. 
+
+=== Original atmosphere ===
+At first it was mainly a [[hydrogen]] atmosphere. It  has changed dramatically on several occasions—for example, the [[Great Oxygenation Event]] 2.4 [[billion]] years ago, greatly increased [[oxygen]] in the atmosphere from practically no oxygen to levels closer to present day. Humans have also contributed to significant changes in atmospheric composition through air pollution, especially since [[industrialisation]], leading to rapid environmental change such as ozone depletion and global warming.
+
+=== Second atmosphere ===
+Outgassing from [[volcanism]], supplemented by gases produced during the [[Late Heavy Bombardment|late heavy bombardment]] of Earth by huge asteroids, produced the next atmosphere, consisting largely of [[nitrogen]] plus [[carbon dioxide]] and [[inert gas]]es.<ref>Zahnle K; Schaefer L; & Fegley B. 2010. Earth's earliest atmospheres. Cold Spring Harbor Perspectives in Biology. 2 (10). PMID 20573713</ref>
+
+=== Third atmosphere ===
+[[File:Sauerstoffgehalt-1000mj2.png|thumb|Oxygen content of the atmosphere over the last billion years<ref>{{cite journal |last1=Martin |first1=Daniel |last2=McKenna |first2=Helen |last3=Livina |first3=Valerie |title=The human physiological impact of global deoxygenation |journal=The Journal of Physiologica |doi=10.1007/s12576-016-0501-0 |pmid=27848144 |pmc=5138252 |issn=1880-6546 |year=2016 }}</ref><ref>[http://www.nap.edu/openbook/0309100615/gifmid/30.gif http://www.nap.edu/openbook/0309100615/gifmid/30.gif]</ref>]]
+
+The constant re-arrangement of continents by [[plate tectonics]] influences the long-term evolution of the atmosphere. Carbon dioxide was transferred to and from large continental carbonate stores. Free oxygen did not exist in the atmosphere until about 2.4 billion years ago. The [[Great Oxygenation Event]] is shown by the end of the [[banded iron formation]]s.
+
+== Related pages ==
+* [[Air pollution]]
+* [[Air craft]]
+
+== References ==
+{{reflist}}
+
+
+
+
+[[Category:Basic English 850 words]]
+[[Category:Physics]]
+[[Category:Atmosphere]]
