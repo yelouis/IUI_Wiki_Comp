@@ -114,6 +114,7 @@ class XMLDumpParser:
                 sorted_keys = [k for k, v in sorted(article.revisions.items(), key=lambda item: item[1].date)]
                 article.current_id = sorted_keys[0]
                 article.first_id = sorted_keys[-1]
+                article.calculate_scores()
                 return article
 
         return None

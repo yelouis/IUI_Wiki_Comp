@@ -23,9 +23,10 @@ while len(inserts) > 0:
 		for revision in article.revisions:
 			articleText = article.revisions[revision].text
 			# compressedArtText = zlib.compress(articleText.encode())
+			flesch = article.revisions[revision].get_score("flesch")
 			try:
 				cur.execute(f"""INSERT INTO public."revisionHistory" VALUES (
-					{article.revisions[revision].current_id},
+					{article.revisions[revision].id},
 					'{article.title}',
 					TIMESTAMP '{article.revisions[revision].date}',
 					-1, -1, -1, -1, -1, -1,

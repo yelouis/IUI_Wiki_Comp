@@ -15,6 +15,9 @@ CATEGORY_REGEX = "Category:"
 
 LINK_REGEX = "((http|https)?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)"
 
+A_SCORES = ["num_edits", "num_unique_authors", "author_diversity", "age", "currency"]
+R_SCORES = ["num_internal_links", "num_external_links", "num_images", "flesch", "kincaid"]
+
 class WikipediaArticle:
     id: int = -1
     title: str = "N/A"
@@ -111,7 +114,7 @@ class WikipediaRevision:
         score = self.scores.get(score_name)
         if score:
             return score
-        return None
+        return -1
 
     def calculate_scores(self):
         self.internal_links()
