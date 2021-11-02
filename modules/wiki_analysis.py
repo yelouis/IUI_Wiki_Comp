@@ -3,6 +3,7 @@ from typing import Optional, Union
 from datetime import datetime
 import mwparserfromhell as mw
 import re
+import textstat
 
 import wiki_req as wr
 
@@ -18,7 +19,7 @@ class WikipediaArticle:
     id: int = -1
     title: str = "N/A"
     current_id: int = -1
-    parent_id: int = -1  # parent id
+    first_id: int = -1
     ns: int = -1   # namespace
     revisions: dict[int, WikipediaRevision]
     notext: int = 0 # number of revisions with no text
@@ -30,7 +31,7 @@ class WikipediaArticle:
 
         if id is not None:
             self.id = id
-            rvs, self.current_id, self.parent_id = wr.get_article_properties(self.id)
+            rvs, self.current_id, parent_id = wr.get_article_properties(self.id)
 
             for rv in rvs:
                 self.revisions[rv] = WikipediaRevision(self, rv)
@@ -39,18 +40,12 @@ class WikipediaArticle:
         return f"Article(id={self.id}, title={self.title}, num_revisions={len(self.revisions)}, num_notext={self.notext})"
 
     def __str__(self):
-        return f"{self.id}, {self.title}, {self.current_id}, {self.parent_id}, {len(self.revisions)}, {self.notext},\n"
+        return f"{self.id}, {self.title}, {self.current_id}, {len(self.revisions)}, {self.notext},\n"
 
     def get_current_revision(self) -> Optional[WikipediaRevision]:
         current_revision = self.revisions.get(self.current_id)
         if current_revision:
             return current_revision
-        return None
-
-    def get_parent_revision(self) -> Optional[WikipediaRevision]:
-        parent_revision = self.revisions.get(self.parent_id)
-        if parent_revision:
-            return parent_revision
         return None
 
     def get_score(self, score_name: str) -> Optional[Union[int, float]]:
@@ -62,6 +57,10 @@ class WikipediaArticle:
     def calculate_scores(self):
         self.author_scores()
         self.article_age()
+        self.scores["num_edits"] = len(self.revisions)
+
+        for revision in self.revisions.values():
+            revision.calculate_scores()
         
     def author_scores(self):
         authors = set()
@@ -71,11 +70,12 @@ class WikipediaArticle:
         self.scores["author_diversity"] = len(authors) / len(self.revisions)
 
     def article_age(self):
-        # get article age and currency
-        current_revision = self.get_current_revision()
-        if current_revision.date != datetime(1970, 1, 1):
-            diff = datetime.now() - current_revision.date
-            self.scores["currency"] = abs(diff.days)
+        now = datetime.now()
+        first_revision = self.revisions.get(self.first_id)
+        current_revision = self.revisions.get(self.current_id)
+        
+        self.scores["age"] = (now - first_revision.date).days
+        self.scores["currency"] = (now - current_revision.date).days        
 
 class WikipediaRevision:
     id: int = -1
@@ -116,20 +116,42 @@ class WikipediaRevision:
     def calculate_scores(self):
         self.internal_links()
         self.external_links()
+        self.num_images()
+        self.textstat_scores()
 
     def internal_links(self):
-        i_links = re.findall("\[\[.+|.+\]\]", self.raw_text)
-        self.scores["num_internal_links"] = len(i_links)
-        
-        
+        if self.raw_text != "N/A":
+            i_links = re.findall("\[\[.+|.+\]\]", self.raw_text)
+            self.scores["num_internal_links"] = len(i_links)
+
     def external_links(self):
-        i_links = re.findall(LINK_REGEX, self.raw_text)
-        self.scores["num_external_links"] = len(i_links)
+        if self.raw_text != "N/A":
+            i_links = re.findall(LINK_REGEX, self.raw_text)
+            self.scores["num_external_links"] = len(i_links)
+    
+    def num_images(self):  
+        if self.raw_text != "N/A":
+            images = re.findall("\[\[Image:.*\]\]", self.raw_text)
+            self.scores["num_images"] = len(images)
+        
+    def textstat_scores(self):
+        if self.text != "N/A":
+            self.scores["flesch"] = textstat.flesch_reading_ease(self.text)
+            self.scores["kincaid"] = textstat.flesch_kincaid_grade(self.text)
+        
+        # textstat.smog_index(test_data)
+        # textstat.coleman_liau_index(test_data)
+        # textstat.automated_readability_index(test_data)
+        # textstat.dale_chall_readability_score(test_data)
+        # textstat.difficult_words(test_data)
+        # textstat.linsear_write_formula(test_data)
+        # textstat.gunning_fog(test_data)
+        # textstat.text_standard(test_data)
+        # textstat.fernandez_huerta(test_data)
+        # textstat.szigriszt_pazos(test_data)
+        # textstat.gutierrez_polini(test_data)
+        # textstat.crawford(test_data)
+        # textstat.gulpease_index(test_data)
+        # textstat.osman(test_data)
 
-    def ASL(self, text):
-        # TODO
-        pass
 
-    def flesch_read(self, text):
-        # TODO
-        pass

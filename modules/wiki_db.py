@@ -1,5 +1,4 @@
 import psycopg2
-import zlib
 
 import wiki_dump as wd
 

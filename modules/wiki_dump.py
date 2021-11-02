@@ -51,18 +51,20 @@ class XMLDumpParser:
     # iterates the XML context once from <page>
     # to </page> producing a single article object
     # SIDE EFFECT: iterates xml_context
-    def parse_single_page(self):
+    def parse_single_page(self) -> Optional[wa.WikipediaArticle]:
         for event, elem in self.xml_context:
             tag = elem.tag.split("}")[1]
 
             if event == "start" and tag == "page":
                 return self._parse_page()
 
+        return None
+
     # iterates xml until it finds a page tag
     # then parses that page via _parse_page()
     # returns a dict of pages once n pages are collected
     # SIDE EFFECT: iterates xml_context
-    def parse_n_pages(self, n: int):
+    def parse_n_pages(self, n: int) -> dict[int, wa.WikipediaArticle]:
         articles = {}
 
         for event, elem in self.xml_context:
@@ -77,6 +79,8 @@ class XMLDumpParser:
 
             if len(articles) == n:
                 return articles
+        
+        return articles
 
     # continues xml_context and parses a single <page> tag
     # if it encounters a <revision> tag, calls parse_revision()
@@ -107,6 +111,9 @@ class XMLDumpParser:
                         article.revisions[revision.id] = revision
 
             elif tag == "page" and event == "end":
+                sorted_keys = [k for k, v in sorted(article.revisions.items(), key=lambda item: item[1].date)]
+                article.current_id = sorted_keys[0]
+                article.first_id = sorted_keys[-1]
                 return article
 
         return None
@@ -114,7 +121,7 @@ class XMLDumpParser:
     # continues xml_context and parses the remainder
     # of a <page> tag, ignoring all the data
     # SIDE EFFECT: iterates xml_context
-    def _iterate_to_page_end(self):
+    def _iterate_to_page_end(self) -> bool:
         for event, elem in self.xml_context:
             tag = elem.tag.split("}")[1]
             if tag == "page" and event == "end":
@@ -134,14 +141,6 @@ class XMLDumpParser:
                 if tag == "id":
                     if elem.text:
                         revision.id = int(elem.text)
-                    if len(article.revisions) == 0:
-                        # first revision -> newest
-                        article.current_id = revision.id
-
-                elif tag == "parentid":
-                    if len(article.revisions) == 0 and elem.text:
-                        # first revision -> newest
-                        article.parent_id = int(elem.text)
 
                 elif tag == "timestamp":
                     if elem.text:
@@ -173,7 +172,7 @@ class XMLDumpParser:
     # continues xml_context and parses the remainder
     # of a <revision> tag, ignoring all the data
     # SIDE EFFECT: iterates xml_context
-    def _iterate_to_revision_end(self):
+    def _iterate_to_revision_end(self) -> bool:
         for event, elem in self.xml_context:
             tag = elem.tag.split("}")[1]
             if tag == "revision" and event == "end":
@@ -205,10 +204,15 @@ def main():
 
     parser = XMLDumpParser(DUMP_FILE)
 
-    ars = parser.parse_n_pages(10)
+    articles = parser.parse_n_pages(10)
+    for a in articles.values():
+        a.calculate_scores()
+        for r in a.revisions.values():
+            print(r.scores)
+        print(a.scores)
 
-    for a in ars.values():
-        print(list(a.revisions.items())[0][1].text)
+
+    
 
 
 if __name__ == "__main__":
