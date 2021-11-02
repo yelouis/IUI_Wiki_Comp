@@ -27,10 +27,6 @@ class WikipediaArticle:
     def __init__(self, id: int = None):
         self.revisions = {}
         self.scores = {}
-        self.numAuthors = 0
-        self.totalAuthors = 0
-        self.internal_links = 0
-        self.external_links = 0
 
         if id is not None:
             self.id = id
