@@ -1,9 +1,18 @@
 from __future__ import annotations
-from typing import Optional
-from datetime import date
+from typing import Optional, Union
+from datetime import datetime
+import mwparserfromhell as mw
+import re
 
 import wiki_req as wr
 
+SYMBOL_REGEX = "[\[\]\(\)',`~=\n\*\+\\\/]"
+
+IMAGE_REGEX = "\[\[.*\]\]"
+
+CATEGORY_REGEX = "Category:"
+
+LINK_REGEX = "((http|https)?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)"
 
 class WikipediaArticle:
     id: int = -1
@@ -13,9 +22,16 @@ class WikipediaArticle:
     ns: int = -1   # namespace
     revisions: dict[int, WikipediaRevision]
     notext: int = 0 # number of revisions with no text
+    scores: dict[str, Union[int, float]]
 
     def __init__(self, id: int = None):
         self.revisions = {}
+        self.scores = {}
+        self.numAuthors = 0
+        self.totalAuthors = 0
+        self.internal_links = 0
+        self.external_links = 0
+
         if id is not None:
             self.id = id
             rvs, self.current_id, self.parent_id = wr.get_article_properties(self.id)
@@ -41,13 +57,37 @@ class WikipediaArticle:
             return parent_revision
         return None
 
+    def get_score(self, score_name: str) -> Optional[Union[int, float]]:
+        score = self.scores.get(score_name)
+        if score:
+            return score
+        return None
+
+    def calculate_scores(self):
+        self.author_scores()
+        self.article_age()
+        
+    def author_scores(self):
+        authors = set()
+        for revision in self.revisions.values():
+            authors.add(revision.author_id)
+        self.scores["num_unique_authors"] = len(authors)
+        self.scores["author_diversity"] = len(authors) / len(self.revisions)
+
+    def article_age(self):
+        # get article age and currency
+        current_revision = self.get_current_revision()
+        if current_revision.date != datetime(1970, 1, 1):
+            diff = datetime.now() - current_revision.date
+            self.scores["currency"] = abs(diff.days)
 
 class WikipediaRevision:
     id: int = -1
-    date: date = date(1970, 1, 1)
+    date: datetime = datetime(1970, 1, 1)
     scores: dict[str, float]
     author_name: str = "N/A"
     author_id: int = -1
+    raw_text: str = "N/A"
     text: str = "N/A"
 
     def __init__(self, article: WikipediaArticle = None, id: int = None):
@@ -61,38 +101,39 @@ class WikipediaRevision:
         # TODO: Add self.text to the end, add all the scores to the end
         return f"{self.id}, {self.date}, {self.author_name}, {self.author_id},\n"
 
+    def process_text(self):
+        # TODO: turn wikipedia article mumbo into just text
+        wikicode = mw.parse(self.raw_text)
+        stripped1 = wikicode.strip_code() # removes [[page | word]] pairs and [[words]]
+        stripped2 = re.sub(IMAGE_REGEX, '', stripped1) #removes [[Image:.*]]
+        stripped3 = re.sub(LINK_REGEX, '', stripped2) #removes links
+        stripped4 = re.sub(SYMBOL_REGEX, '', stripped3) # removes all the bad symbols (but not essential punctuation)
+        stripped5 = re.sub("(?<=[a-z\.:?!0-9])(?=[A-Z])", " ", stripped4) # puts space in CacciaMagazineOttobre2020 Caccia Magazine Ottobre 2020
+        self.text = re.sub(CATEGORY_REGEX, ' ', stripped5) # removes Category:
+
     def get_score(self, score_name: str) -> Optional[float]:
         score = self.scores.get(score_name)
         if score:
             return score
         return None
 
-    def author_metrics(self, id):
-        # get num unique editors, how diverse they are and admin proportions
-        pass
+    def calculate_scores(self):
+        self.internal_links()
+        self.external_links()
 
-    def internal_links(self, id):
-        # Gets number of internal links article has
-        pass
-
-    def external_links(self, id):
-        # Gets number of external links article has
-        pass
-
-    def article_age(self, id):
-        # get article age and currency
-        pass
+    def internal_links(self):
+        i_links = re.findall("\[\[.+|.+\]\]", self.raw_text)
+        self.scores["num_internal_links"] = len(i_links)
+        
+        
+    def external_links(self):
+        i_links = re.findall(LINK_REGEX, self.raw_text)
+        self.scores["num_external_links"] = len(i_links)
 
     def ASL(self, text):
-        # Average sentence length computation (NOT DONE)
-        numSentences = 0
-        for item in text:
-            if item == "." or item == "?" or item == "!":
-                numSentences += 1
+        # TODO
         pass
 
     def flesch_read(self, text):
-        # Computes flesch readability for the article
-        # not sure if take in text or the id
-        avgSentenceLength = self.ASL(text)
+        # TODO
         pass

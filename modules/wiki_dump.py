@@ -34,7 +34,7 @@ class XMLDumpParser:
         articles = self.parse_n_pages(n)
         try:
             with open(filename, 'w') as out:
-                out.write("pageId, name, currentId, parentId, numRevisions, numNoText")
+                out.write("pageId, name, currentId, parentId, numRevisions, numNoText\n")
                 for a in articles.values():
                     out.write(str(a))
                     r_fname = r_folder + f"{a.id}_revisions.csv"
@@ -162,7 +162,8 @@ class XMLDumpParser:
                             self._iterate_to_revision_end()
                             return None
 
-                    revision.text = elem.text
+                    revision.raw_text = elem.text
+                    revision.process_text()
 
             elif tag == "revision" and event == "end":
                 return revision
@@ -204,7 +205,10 @@ def main():
 
     parser = XMLDumpParser(DUMP_FILE)
 
-    parser.write_n_pages_to_csv("test.csv", "", 10)
+    ars = parser.parse_n_pages(10)
+
+    for a in ars.values():
+        print(list(a.revisions.items())[0][1].text)
 
 
 if __name__ == "__main__":
