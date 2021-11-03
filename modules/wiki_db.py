@@ -26,30 +26,46 @@ def main():
 
 	wiki_dump = wd.XMLDumpParser("../dumps/simplewiki-latest-pages-meta-history.xml.bz2")
 
-	amount = 10
+	amount = 100
 	inserts = wiki_dump.parse_n_pages(amount)
+	commitTime = 0
 
 	while len(inserts) > 0:
 		for article in inserts.values():
+			num_edits = article.get_score("num_edits")
+			num_unique_authors = article.get_score("num_unique_authors")
+			author_diversity = article.get_score("author_diversity")
+			age = article.get_score("age")
+			currency = article.get_score("currency")
+
 			try:
-				cur.execute(f"""INSERT INTO public."article" VALUES ({article.id}, '{article.title}', {article.current_id})""")
+				cur.execute(f"""INSERT INTO public."article" VALUES ({article.id}, '{article.title}',
+				{article.current_id}, {num_edits}, {num_unique_authors}, {author_diversity}, {age}, {currency})""")
 			except:
 				print("pageID already exists")
 			for revision in article.revisions:
-				articleText = article.revisions[revision].text
+				text = article.revisions[revision].text
+				article_length = len(text)
 				# compressedArtText = zlib.compress(articleText.encode())
 				flesch = article.revisions[revision].get_score("flesch")
+				kincaid = article.revisions[revision].get_score("kincaid")
+				num_internal_links = article.revisions[revision].get_score("num_internal_links")
+				num_external_links = article.revisions[revision].get_score("num_external_links")
+				num_images = article.revisions[revision].get_score("num_images")
+				average_sentence_length = article.revisions[revision].get_score("average_sentence_length")
+
 				try:
 					cur.execute(f"""INSERT INTO public."revisionHistory" VALUES (
 						{article.revisions[revision].id},
-						'{article.title}',
-						TIMESTAMP '{article.revisions[revision].date}',
-						-1, -1, -1, -1, -1, -1,
-						{len(articleText)},
-						-1, -1, -1, -1, -1, {article.id}, $${articleText}$$) """)
+						'{article.title}', {num_internal_links}, {num_external_links},
+						{article_length}, {article.id}, {flesch}, {kincaid}, {num_images},
+						{average_sentence_length},
+						TIMESTAMP '{article.revisions[revision].date}', $${text}$$) """)
 				except:
 					print("row already exists")
 		conn.commit()
+		commitTime += 1
+		print("Commited" + str(commitTime))
 		inserts = wiki_dump.parse_n_pages(amount)
 
 
