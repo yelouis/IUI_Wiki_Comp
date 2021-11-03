@@ -7,7 +7,7 @@ import textstat
 
 import wiki_req as wr
 
-SYMBOL_REGEX = "[\[\]\(\)',`~=\n\*\+\\\/]"
+SYMBOL_REGEX = "[\[\]\(\)',`~=\n\*\+\\\/$%&\^\*]"
 
 IMAGE_REGEX = "\[\[.*\]\]"
 
@@ -64,7 +64,7 @@ class WikipediaArticle:
 
         for revision in self.revisions.values():
             revision.calculate_scores()
-        
+
     def author_scores(self):
         authors = set()
         for revision in self.revisions.values():
@@ -76,9 +76,9 @@ class WikipediaArticle:
         now = datetime.now()
         first_revision = self.revisions.get(self.first_id)
         current_revision = self.revisions.get(self.current_id)
-        
+
         self.scores["age"] = (now - first_revision.date).days
-        self.scores["currency"] = (now - current_revision.date).days        
+        self.scores["currency"] = (now - current_revision.date).days
 
 class WikipediaRevision:
     id: int = -1
@@ -131,18 +131,18 @@ class WikipediaRevision:
         if self.raw_text != "N/A":
             i_links = re.findall(LINK_REGEX, self.raw_text)
             self.scores["num_external_links"] = len(i_links)
-    
-    def num_images(self):  
+
+    def num_images(self):
         if self.raw_text != "N/A":
             images = re.findall("\[\[Image:.*\]\]", self.raw_text)
             self.scores["num_images"] = len(images)
-        
+
     def textstat_scores(self):
         if self.text != "N/A":
             self.scores["flesch"] = textstat.flesch_reading_ease(self.text)
             self.scores["kincaid"] = textstat.flesch_kincaid_grade(self.text)
             self.scores["average_sentence_length"] = textstat.avg_sentence_length(self.text)
-        
+
         # textstat.smog_index(test_data)
         # textstat.coleman_liau_index(test_data)
         # textstat.automated_readability_index(test_data)
@@ -157,5 +157,3 @@ class WikipediaRevision:
         # textstat.crawford(test_data)
         # textstat.gulpease_index(test_data)
         # textstat.osman(test_data)
-
-
