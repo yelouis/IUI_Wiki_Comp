@@ -1,6 +1,6 @@
 
+from __future__ import annotations
 from typing import Iterable, Tuple, Any, Optional, IO
-
 import bz2
 from datetime import datetime
 import xml.etree.ElementTree as etree
@@ -79,7 +79,7 @@ class XMLDumpParser:
 
             if len(articles) == n:
                 return articles
-        
+
         return articles
 
     # continues xml_context and parses a single <page> tag
@@ -214,7 +214,7 @@ def main():
         print(a.scores)
 
 
-    
+
 
 
 if __name__ == "__main__":

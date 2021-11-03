@@ -1,3 +1,4 @@
+from __future__ import annotations
 import psycopg2
 from typing import Optional
 
@@ -61,17 +62,17 @@ def main():
 		# for revision in article.revisions:
 		# 	try:
 		#      cur.execute(f"""INSERT INTO public."revisionHistory" VALUES (
-		#      	{revision.id}, 
-		#      	'{revision.title}', 
-		#      	{revision.date}, 
+		#      	{revision.id},
+		#      	'{revision.title}',
+		#      	{revision.date},
 		#      	{revision.author_metrics(revision.id)},
-		#      	{revision.num_edits}, 
-		#      	{revision.num_edits_regis}, 
-		#      	{revision.num_edits_anom}, 
-		#      	{revision.internal_links(revision.id)}, 
-		#      	{revision.external_links(revision.id)}, 
-		#      	{len(revision.text)}, 
-		#      	{revision.author_metrics(revision.id)}, 
+		#      	{revision.num_edits},
+		#      	{revision.num_edits_regis},
+		#      	{revision.num_edits_anom},
+		#      	{revision.internal_links(revision.id)},
+		#      	{revision.external_links(revision.id)},
+		#      	{len(revision.text)},
+		#      	{revision.author_metrics(revision.id)},
 		#      	{revision.admin_edits_prop},
 		#      	{revision.article_age(revision.id)},
 		#      	{article.revisions.values().index(revision)},
