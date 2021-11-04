@@ -15,6 +15,14 @@ class DatabaseAccess:
 		except:
 			print("Connection failed.")
 
+	def pullArticle(chosenID):
+		chosenArticle = cur.execute("""SELECT * FROM public.article WHERE id = {chosenID}""")
+		return chosenArticle
+
+	def pullRevision(chosenID):
+		chosenRevision = cur.execute("""SELECT * FROM public."revisionHistory" WHERE id = {chosenID}""")
+		return chosenRevision
+
 
 def main():
 	try:
@@ -69,44 +77,6 @@ def main():
 		print("Parse Time: " + str(parse_end - parse_start))
 		print("Commit Time: " + str(commit_end - parse_end))
 		inserts = wiki_dump.parse_n_pages(amount)
-
-
-	# for article in inserts.values():
-	#     try:
-	#         cur.execute(f"""INSERT INTO public."article" VALUES ({article.id}, '{article.title}', {article.current_id})""")
-	#     except:
-	#         print("pageID already exists")
-
-		# for revision in article.revisions:
-		# 	try:
-		#      cur.execute(f"""INSERT INTO public."revisionHistory" VALUES (
-		#      	{revision.id},
-		#      	'{revision.title}',
-		#      	{revision.date},
-		#      	{revision.author_metrics(revision.id)},
-		#      	{revision.num_edits},
-		#      	{revision.num_edits_regis},
-		#      	{revision.num_edits_anom},
-		#      	{revision.internal_links(revision.id)},
-		#      	{revision.external_links(revision.id)},
-		#      	{len(revision.text)},
-		#      	{revision.author_metrics(revision.id)},
-		#      	{revision.admin_edits_prop},
-		#      	{revision.article_age(revision.id)},
-		#      	{article.revisions.values().index(revision)},
-		#      	{revision.mean_revision_time},
-		#      	{article.id}, )""")
-		#      # info we cannot get yet:
-		#      # title
-		#      # num_edits
-		#      # num_edits_regis
-		#      # num_edits_anom
-		#      # art_length - depending on what this is asking. Right now I am just getting text length
-		#      # author_diversity - this comes from author_metrics(revision.id)? What is the return type of this function?
-		#      # admin_edits_prop
-		#      # mean_revision_time
-		#  except:
-		#      print("id already exists")
 
 	conn.commit()
 
