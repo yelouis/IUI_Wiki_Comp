@@ -111,9 +111,10 @@ class XMLDumpParser:
                         article.revisions[revision.id] = revision
 
             elif tag == "page" and event == "end":
-                sorted_keys = [k for k, v in sorted(article.revisions.items(), key=lambda item: item[1].date)]
-                article.current_id = sorted_keys[0]
-                article.first_id = sorted_keys[-1]
+                if len(article.revisions) > 0:
+                    sorted_keys = [k for k, v in sorted(article.revisions.items(), key=lambda item: item[1].date)]
+                    article.current_id = sorted_keys[0]
+                    article.first_id = sorted_keys[-1]
                 article.calculate_scores()
                 return article
 
