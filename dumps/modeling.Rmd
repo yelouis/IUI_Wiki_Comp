@@ -1,0 +1,39 @@
+---
+title: "Statistical Modeling"
+author: "Nathan Hayes-Rich"
+date: "11/7/2021"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(readr)
+
+setwd("S:/School/2021 - 2022/FALL/CS399/IUI_Wiki_Comp/dumps")
+```
+
+```{r}
+articles <- na_if(as.tibble(read_csv("articles.csv")), -1)
+revisions <- na_if(as.tibble(read_csv("revisions.csv")), -1)
+vg_articles <- c("1910 Cuba hurricane","American Airlines Flight 11","Baseball uniform","City of Manchester Stadium","Mourning dove","Evolution","Hermann Göring","Gothic architecture","Billy Graham","Hurricane Vince","Ipswich Town F.C.","Jupiter","Dan Kelly","Kingsway tramway subway","Lawrence, Kansas","The Lightning Thief","Commodore Nutt","Portman Road","Powderfinger","Ronald Reagan","Red Hot Chili Peppers","Bobby Robson","Saturn","Le Spectre de la rose","Tropical Depression Ten (2005)","Tropical Storm Barry (2007)","Tropical Storm Gabrielle (2007)")
+```
+
+
+```{r}
+summarized_rev <- revisions %>%
+  select(-...12) %>%
+  group_by(article_id) %>%
+  summarize(mean_nil = mean(num_internal_links, na.rm=TRUE), 
+            mean_nel = mean(num_external_links, na.rm=TRUE),
+            mean_len = mean(article_length, na.rm=TRUE),
+            mean_flesch = mean(flesch, na.rm=TRUE),
+            mean_kincaid = mean(kincaid, na.rm=TRUE),
+            mean_num_im = mean(num_images, na.rm=TRUE), 
+            mean_asl = mean(average_sentence_length, na.rm=TRUE))
+
+total <- articles %>% 
+  left_join(summarized_rev, by = c("id" = "article_id"))
+
+
+```
+
