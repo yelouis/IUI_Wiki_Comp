@@ -78,14 +78,15 @@ def main():
 								{average_sentence_length},
 								TIMESTAMP '{article.revisions[revision].date}', $${text}$$) """)
 						except:
-							print(f"Error adding: {article.title}: {revision=}")
+							# print(f"Error adding: {article.title}: {revision=}")
+							pass
 		parse_end = time.time()
 		conn.commit()
 		commit_end = time.time()
 		num_commits += 1
 		print(f"Committed for the {num_commits}th time!")
-		print(f"Parse Time: {parse_end - parse_start:.3f}s")
-		print(f"Commit Time: {commit_end - parse_end:.3f}s")
+		print(f"Parse Time: {25 * (parse_end - parse_start):.3f}s")
+		print(f"Commit Time: {25 * (commit_end - parse_end):.3f}s")
 		inserts = wiki_dump.parse_n_pages(amount)
 
 	conn.commit()
