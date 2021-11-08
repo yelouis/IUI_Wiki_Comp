@@ -5,3 +5,4 @@
 *.7z
 *.csv
 dumps/.Rhistory
+modules/nohup.out
