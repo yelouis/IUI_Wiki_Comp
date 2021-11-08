@@ -15,12 +15,12 @@ class DatabaseAccess:
 		except:
 			print("Connection failed.")
 
-	def pullArticle(chosenID):
-		chosenArticle = cur.execute("""SELECT * FROM public.article WHERE id = {chosenID}""")
+	def pullArticle(self, chosenID):
+		chosenArticle = self.cursor.execute("""SELECT * FROM public.article WHERE id = {chosenID}""")
 		return chosenArticle
 
-	def pullRevision(chosenID):
-		chosenRevision = cur.execute("""SELECT * FROM public."revisionHistory" WHERE id = {chosenID}""")
+	def pullRevision(self, chosenID):
+		chosenRevision = self.cursor.execute("""SELECT * FROM public."revisionHistory" WHERE id = {chosenID}""")
 		return chosenRevision
 
 
