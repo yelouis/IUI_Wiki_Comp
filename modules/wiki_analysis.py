@@ -66,11 +66,12 @@ class WikipediaArticle:
             revision.calculate_scores()
 
     def author_scores(self):
-        authors = set()
-        for revision in self.revisions.values():
-            authors.add(revision.author_id)
-        self.scores["num_unique_authors"] = len(authors)
-        self.scores["author_diversity"] = len(authors) / len(self.revisions)
+        if len(self.revisions) > 0:
+            authors = set()
+            for revision in self.revisions.values():
+                authors.add(revision.author_id)
+            self.scores["num_unique_authors"] = len(authors)
+            self.scores["author_diversity"] = len(authors) / len(self.revisions)
 
     def article_age(self):
         now = datetime.now()
