@@ -74,12 +74,13 @@ class WikipediaArticle:
             self.scores["author_diversity"] = len(authors) / len(self.revisions)
 
     def article_age(self):
-        now = datetime.now()
-        first_revision = self.revisions.get(self.first_id)
-        current_revision = self.revisions.get(self.current_id)
+        if len(self.revisions) > 0:
+            now = datetime.now()
+            first_revision = self.revisions.get(self.first_id)
+            current_revision = self.revisions.get(self.current_id)
 
-        self.scores["age"] = (now - first_revision.date).days
-        self.scores["currency"] = (now - current_revision.date).days
+            self.scores["age"] = (now - first_revision.date).days
+            self.scores["currency"] = (now - current_revision.date).days
 
 class WikipediaRevision:
     id: int = -1
