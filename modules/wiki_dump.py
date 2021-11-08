@@ -30,14 +30,13 @@ class XMLDumpParser:
         if self.bz2_dump is not None:
             self.bz2_dump.close()
 
-    def write_n_pages_to_csv(self, filename: str, r_folder: str, n: int) -> bool:
+    def write_n_pages_to_csv(self, r_folder: str, filename: str, n: int) -> bool:
         articles = self.parse_n_pages(n)
         try:
-            with open(filename, 'w') as out:
-                out.write("pageId, name, currentId, parentId, numRevisions, numNoText")
+            with open(f"{r_folder}{filename}", 'w') as out:
                 for a in articles.values():
                     out.write(str(a))
-                    r_fname = r_folder + f"{a.id}_revisions.csv"
+                    r_fname = f"{r_folder}{a.id}_revisions.csv"
                     with open(r_fname, 'w') as r_out:
                         for r in a.revisions.values():
                             r_out.write(str(r))
@@ -204,7 +203,7 @@ def main():
 
     parser = XMLDumpParser(DUMP_FILE)
 
-    parser.write_n_pages_to_csv("test.csv", "", 10)
+    parser.write_n_pages_to_csv("../", "articles.csv", 10)
 
 
 if __name__ == "__main__":
