@@ -16,11 +16,15 @@ class DatabaseAccess:
 			print("Connection failed.")
 
 	def pullArticle(self, chosenID):
-		chosenArticle = self.cursor.execute("""SELECT * FROM public.article WHERE id = {chosenID}""")
+		query = f"""SELECT * FROM public.article WHERE id = {chosenID}"""
+		chosenArticle = self.cursor.execute(query)
+		print(chosenArticle)
 		return chosenArticle
 
 	def pullRevision(self, chosenID):
-		chosenRevision = self.cursor.execute("""SELECT * FROM public."revisionHistory" WHERE id = {chosenID}""")
+		query = f"""SELECT * FROM public."revisionHistory" WHERE id = {chosenID}"""
+		chosenRevision = self.cursor.execute(query)
+		print(chosenRevision)
 		return chosenRevision
 
 
@@ -36,7 +40,7 @@ def main():
 
 	amount = 10
 	inserts = wiki_dump.parse_n_pages(amount)
-	commitTime = 0
+	num_commits = 0
 
 
 	while len(inserts) > 0:
@@ -49,8 +53,11 @@ def main():
 			currency = article.get_score("currency")
 
 			if article.id != -1:
-				cur.execute(f"""INSERT INTO public."article" VALUES ({article.id}, $${article.title}$$,
-				{article.current_id}, {num_edits}, {num_unique_authors}, {author_diversity}, {age}, {currency})""")
+				try:
+					cur.execute(f"""INSERT INTO public."article" VALUES ({article.id}, $${article.title}$$,
+								{article.current_id}, {num_edits}, {num_unique_authors}, {author_diversity}, {age}, {currency})""")
+				except: 
+					print(f"Error adding: {article.title}")
 				for revision in article.revisions:
 					text = article.revisions[revision].text
 					article_length = len(text)
@@ -63,19 +70,22 @@ def main():
 					average_sentence_length = article.revisions[revision].get_score("average_sentence_length")
 
 					if article.revisions[revision].id != -1:
-						cur.execute(f"""INSERT INTO public."revisionHistory" VALUES (
-							{article.revisions[revision].id},
-							$${article.title}$$, {num_internal_links}, {num_external_links},
-							{article_length}, {article.id}, {flesch}, {kincaid}, {num_images},
-							{average_sentence_length},
-							TIMESTAMP '{article.revisions[revision].date}', $${text}$$) """)
+						try:
+							cur.execute(f"""INSERT INTO public."revisionHistory" VALUES (
+								{article.revisions[revision].id},
+								$${article.title}$$, {num_internal_links}, {num_external_links},
+								{article_length}, {article.id}, {flesch}, {kincaid}, {num_images},
+								{average_sentence_length},
+								TIMESTAMP '{article.revisions[revision].date}', $${text}$$) """)
+						except:
+							print(f"Error adding: {article.title}: {revision=}")
 		parse_end = time.time()
 		conn.commit()
 		commit_end = time.time()
-		commitTime += 1
-		print("Committed" + str(commitTime))
-		print("Parse Time: " + str(parse_end - parse_start))
-		print("Commit Time: " + str(commit_end - parse_end))
+		num_commits += 1
+		print(f"Committed for the {num_commits}th time!")
+		print(f"Parse Time: {parse_end - parse_start:.3f}s")
+		print(f"Commit Time: {commit_end - parse_end:.3f}s")
 		inserts = wiki_dump.parse_n_pages(amount)
 
 	conn.commit()
