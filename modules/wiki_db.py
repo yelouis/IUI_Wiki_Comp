@@ -15,23 +15,22 @@ class DatabaseAccess:
 		except:
 			print("Connection failed.")
 
-	def pullArticle(self, chosenID):
+	def pullArticleByID(self, chosenID):
 		query = f"""SELECT * FROM public.article WHERE id = {chosenID}"""
 		chosenArticle = self.cursor.execute(query)
 		rows = self.cursor.fetchall()
-		print(rows)
 		return rows
 
-	def pullRevision(self, chosenID):
+	def pullRevisionByID(self, chosenID):
 		query = f"""SELECT * FROM public."revisionHistory" WHERE id = {chosenID}"""
 		chosenRevision = self.cursor.execute(query)
-		print(chosenRevision)
-		return chosenRevision
+		rows = self.cursor.fetchall()
+		return rows
 
 
 def main():
 	testing = DatabaseAccess()
-	testing.pullArticle("1")
+	print(testing.pullArticleByID("1"))
 	quit()
 
 	try:
