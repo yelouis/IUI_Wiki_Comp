@@ -30,6 +30,32 @@ class XMLDumpParser:
         if self.bz2_dump is not None:
             self.bz2_dump.close()
 
+    def iterate_past_page(self, page_title: str) -> int:
+        count = 0
+        for event, elem in self.xml_context:
+            tag = elem.tag.split("}")[1]
+
+            if event == "start" and tag == "page":
+                count += 1
+                if count % 100 == 0:
+                    print(f"== {count} articles skipped! == ")
+
+            if event == "start" and tag == "title":
+                if elem.text == page_title:
+                    elem.clear()
+                    break
+
+            elem.clear()
+
+        for event, elem in self.xml_context:
+            tag = elem.tag.split("}")[1]
+
+            if event == "end" and tag == "page":
+                elem.clear()
+                return count
+            
+            elem.clear()
+
     def write_n_pages_to_csv(self, r_folder: str, filename: str, n: int) -> bool:
         articles = self.parse_n_pages(n)
         try:
@@ -56,7 +82,10 @@ class XMLDumpParser:
             tag = elem.tag.split("}")[1]
 
             if event == "start" and tag == "page":
+                elem.clear()
                 return self._parse_page()
+
+            elem.clear()
 
         return None
 
@@ -78,7 +107,10 @@ class XMLDumpParser:
                         print(f"== {len(articles)} processed ==")
 
             if len(articles) == n:
+                elem.clear()
                 return articles
+
+            elem.clear()
 
         return articles
 
@@ -100,6 +132,7 @@ class XMLDumpParser:
                             article.ns = int(elem.text)
                         else:
                             self._iterate_to_page_end()
+                            elem.clear()
                             return None
 
                 elif tag == "id":
@@ -116,7 +149,10 @@ class XMLDumpParser:
                     article.current_id = sorted_keys[0]
                     article.first_id = sorted_keys[-1]
                 article.calculate_scores()
+                elem.clear()
                 return article
+
+            elem.clear()
 
         return None
 
@@ -127,7 +163,9 @@ class XMLDumpParser:
         for event, elem in self.xml_context:
             tag = elem.tag.split("}")[1]
             if tag == "page" and event == "end":
+                elem.clear()
                 return True
+            elem.clear()
 
         return False
 
@@ -161,13 +199,17 @@ class XMLDumpParser:
                         article.notext += 1
                         if not INCLUDE_NO_TEXT:
                             self._iterate_to_revision_end()
+                            elem.clear()
                             return None
 
                     revision.raw_text = elem.text
                     revision.process_text()
 
             elif tag == "revision" and event == "end":
+                elem.clear()
                 return revision
+            
+            elem.clear()
 
         return None
 
@@ -178,7 +220,10 @@ class XMLDumpParser:
         for event, elem in self.xml_context:
             tag = elem.tag.split("}")[1]
             if tag == "revision" and event == "end":
+                elem.clear()
                 return True
+
+            elem.clear()
 
         return False
 
@@ -197,7 +242,10 @@ class XMLDumpParser:
                     id = elem.text
 
             elif tag == "contributor" and event == "end":
+                elem.clear()
                 return username, id
+
+            elem.clear()
 
         return username, id
 

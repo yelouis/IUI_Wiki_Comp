@@ -38,6 +38,12 @@ def main():
 
 	wiki_dump = wd.XMLDumpParser("../dumps/simplewiki-latest-pages-meta-history.xml.bz2")
 
+	# ITERATE TO LATEST ARTICLE ADDED, PROBABLY GEA
+	parse_start = time.time()
+	count = wiki_dump.iterate_past_page("GEA")
+	parse_end = time.time()
+	print(f"{parse_end - parse_start} seconds to iterate past {count} articles.")
+
 	amount = 10
 	num_commits = 0
 
