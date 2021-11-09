@@ -18,7 +18,7 @@ class DatabaseAccess:
 	def pullArticle(self, chosenID):
 		query = f"""SELECT * FROM public.article WHERE id = {chosenID}"""
 		chosenArticle = self.cursor.execute(query)
-		rows = cur.fetchall()
+		rows = self.cursor.fetchall()
 		print(rows)
 		return rows
 
