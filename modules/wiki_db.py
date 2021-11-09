@@ -39,12 +39,11 @@ def main():
 	wiki_dump = wd.XMLDumpParser("../dumps/simplewiki-latest-pages-meta-history.xml.bz2")
 
 	amount = 10
-	inserts = wiki_dump.parse_n_pages(amount)
 	num_commits = 0
-
 
 	while len(inserts) > 0:
 		parse_start = time.time()
+		inserts = wiki_dump.parse_n_pages(amount)
 		for article in inserts.values():
 			num_edits = article.get_score("num_edits")
 			num_unique_authors = article.get_score("num_unique_authors")
@@ -85,9 +84,8 @@ def main():
 		commit_end = time.time()
 		num_commits += 1
 		print(f"Committed for the {num_commits}th time!")
-		print(f"Parse Time: {25 * (parse_end - parse_start):.3f}s")
-		print(f"Commit Time: {25 * (commit_end - parse_end):.3f}s")
-		inserts = wiki_dump.parse_n_pages(amount)
+		print(f"Parse Time: {(parse_end - parse_start):.3f}s")
+		print(f"Commit Time: {(commit_end - parse_end):.3f}s")
 
 	conn.commit()
 
