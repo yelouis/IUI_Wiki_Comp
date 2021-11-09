@@ -27,11 +27,15 @@ class DatabaseAccess:
 		rows = self.cursor.fetchall()
 		return rows
 
+	def foreignKeyJoin(self):
+		query = f"""SELECT * FROM public.article INNER JOIN public."revisionHistory" USING (id);"""
+		return
+
 
 def main():
-	testing = DatabaseAccess()
-	print(testing.pullArticleByID("1"))
-	quit()
+	# testing = DatabaseAccess()
+	# print(testing.foreignKeyJoin())
+	# quit()
 
 	try:
 		conn = psycopg2.connect("dbname='wikipedia' user='mathcsadmin' host='127.0.0.1' password='corgiPower!'")
