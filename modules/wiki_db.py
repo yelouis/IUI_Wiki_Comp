@@ -29,6 +29,10 @@ class DatabaseAccess:
 
 
 def main():
+	testing = DatabaseAccess()
+	testing.pullArticle("1")
+	quit()
+
 	try:
 		conn = psycopg2.connect("dbname='wikipedia' user='mathcsadmin' host='127.0.0.1' password='corgiPower!'")
 	except:
@@ -61,7 +65,7 @@ def main():
 				try:
 					cur.execute(f"""INSERT INTO public."article" VALUES ({article.id}, $${article.title}$$,
 								{article.current_id}, {num_edits}, {num_unique_authors}, {author_diversity}, {age}, {currency})""")
-				except: 
+				except:
 					print(f"Error adding: {article.title}")
 				for revision in article.revisions:
 					text = article.revisions[revision].text
