@@ -47,6 +47,8 @@ def main():
 	amount = 10
 	num_commits = 0
 
+	inserts = {1} # dummy dict for while loop start
+
 	while len(inserts) > 0:
 		parse_start = time.time()
 		inserts = wiki_dump.parse_n_pages(amount)

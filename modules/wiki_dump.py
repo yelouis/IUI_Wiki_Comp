@@ -56,6 +56,8 @@ class XMLDumpParser:
             
             elem.clear()
 
+        return -1
+
     def write_n_pages_to_csv(self, r_folder: str, filename: str, n: int) -> bool:
         articles = self.parse_n_pages(n)
         try:
