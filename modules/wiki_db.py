@@ -18,8 +18,9 @@ class DatabaseAccess:
 	def pullArticle(self, chosenID):
 		query = f"""SELECT * FROM public.article WHERE id = {chosenID}"""
 		chosenArticle = self.cursor.execute(query)
-		print(chosenArticle)
-		return chosenArticle
+		rows = cur.fetchall()
+		print(rows)
+		return rows
 
 	def pullRevision(self, chosenID):
 		query = f"""SELECT * FROM public."revisionHistory" WHERE id = {chosenID}"""
