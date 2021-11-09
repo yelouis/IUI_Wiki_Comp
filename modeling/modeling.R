@@ -1,5 +1,6 @@
 library(tidyverse)
 library(RPostgreSQL)
+library(car)
 
 con <- dbConnect(drv=PostgreSQL(),
                  user="mathcsadmin",
