@@ -21,13 +21,13 @@ revisions$num_external_links[revisions$num_external_links == -1] <- 0
 
 summarized_rev <- revisions %>%
   group_by(article_id) %>%
-  summarize(mean_nil = mean(num_internal_links, na.rm=TRUE), 
-            mean_nel = mean(num_external_links, na.rm=TRUE),
-            mean_len = mean(article_length, na.rm=TRUE),
-            mean_flesch = mean(flesch, na.rm=TRUE),
-            mean_kincaid = mean(kincaid, na.rm=TRUE),
-            mean_num_im = mean(num_images, na.rm=TRUE), 
-            mean_asl = mean(average_sentence_length, na.rm=TRUE))
+  summarize(median_nil = median(num_internal_links, na.rm=TRUE), 
+            median_nel = median(num_external_links, na.rm=TRUE),
+            median_len = median(article_length, na.rm=TRUE),
+            median_flesch = median(flesch, na.rm=TRUE),
+            median_kincaid = median(kincaid, na.rm=TRUE),
+            median_num_im = median(num_images, na.rm=TRUE), 
+            median_asl = median(average_sentence_length, na.rm=TRUE))
 
 total <- articles %>% 
   left_join(summarized_rev, by = c("id" = "article_id")) %>% 
@@ -35,9 +35,11 @@ total <- articles %>%
          vgood = ifelse(title %in% vg_articles, 1, 0),
          gvg = good == 1 | vgood == 1)
 
-total.glm.nolog <- glm(gvg ~ num_edits + num_unique_authors + author_diversity + age + currency + mean_nil + mean_nel + mean_len + mean_flesch + mean_kincaid + mean_num_im + mean_asl, data = total, family = "binomial")
+total.glm.nolog <- glm(gvg ~ num_edits + num_unique_authors + author_diversity + age + currency + median_nil + median_nel + median_len + median_flesch + median_kincaid + median_num_im + median_asl, data = total, family = "binomial")
 
-total.glm <- glm(gvg ~ log(num_edits) + log(num_unique_authors) + author_diversity + log(age) + log(currency) + log(mean_nil + 1) + log(mean_nel + 1) + log(mean_len + 1) + mean_flesch + mean_kincaid + log(mean_num_im + 1) + log(mean_asl + 1), data = total, family = "binomial")
+total.glm <- glm(gvg ~ log(num_edits) + log(num_unique_authors) + author_diversity + log(age) + log(currency) + log(median_nil + 1) + log(median_nel + 1) + log(median_len + 1) + median_flesch + median_kincaid + log(median_num_im + 1) + log(median_asl + 1), data = total, family = "binomial")
+
+summary(total.glm)
 
 pdf("1_influence_plot.pdf")
 influencePlot(total.glm)
@@ -51,37 +53,29 @@ total.glm.red1 <- update(total.glm, . ~ . - log(num_unique_authors))
 anova(total.glm, total.glm.red1, test="Chisq")
 summary(total.glm.red1)
 
-total.glm.red2 <- update(total.glm.red1, . ~ . - log(currency))
+total.glm.red2 <- update(total.glm.red1, . ~ . - median_kincaid)
 anova(total.glm.red2, total.glm.red1, test="Chisq")
 summary(total.glm.red2)
 
-total.glm.red3 <- update(total.glm.red2, . ~ . - mean_kincaid)
+total.glm.red3 <- update(total.glm.red2, . ~ . - log(currency))
 anova(total.glm.red2, total.glm.red3, test="Chisq")
 summary(total.glm.red3)
 
-total.glm.red4 <- update(total.glm.red3, . ~ . - log(mean_nil + 1))
+total.glm.red4 <- update(total.glm.red3, . ~ . - log(median_asl + 1))
 anova(total.glm.red4, total.glm.red3, test="Chisq")
 summary(total.glm.red4)
 
-total.glm.red5 <- update(total.glm.red4, . ~ . - log(mean_asl + 1))
-anova(total.glm.red4, total.glm.red5, test="Chisq")
-summary(total.glm.red5)
-
-total.glm.red6 <- update(total.glm.red5, . ~ . - log(num_edits))
-anova(total.glm.red6, total.glm.red5, test="Chisq")
-summary(total.glm.red6)
-
-total.glm.red7 <- update(total.glm.red6, . ~ . - log(mean_num_im + 1))
-anova(total.glm.red6, total.glm.red7, test="Chisq")
-summary(total.glm.red7)
-
-pdf("7_influence_plot.pdf")
-influencePlot(total.glm.red7)
+pdf("4_influence_plot.pdf")
+influencePlot(total.glm.red4)
 dev.off()
 
-pdf("7_resid.pdf")
-plot(total.glm.red7, which = 1)
+pdf("4_resid.pdf")
+plot(total.glm.red4, which = 1)
 dev.off()
+
+# prediction
+
+total$prediction <- predict(total.glm.red4, newdata = total, type = "response")
 
 # EDA
 
@@ -107,30 +101,30 @@ pdf("hist_currency.pdf")
 hist(total$currency)
 dev.off()
 
-pdf("hist_mean_nil.pdf")
-hist(total$mean_nil)
+pdf("hist_median_nil.pdf")
+hist(total$median_nil)
 dev.off()
 
-pdf("hist_mean_nel.pdf")
-hist(total$mean_nel)
+pdf("hist_median_nel.pdf")
+hist(total$median_nel)
 dev.off()
 
-pdf("hist_mean_len.pdf")
-hist(total$mean_len)
+pdf("hist_median_len.pdf")
+hist(total$median_len)
 dev.off()
 
-pdf("hist_mean_flesch.pdf")
-hist(total$mean_flesch)
+pdf("hist_median_flesch.pdf")
+hist(total$median_flesch)
 dev.off()
 
-pdf("hist_mean_kincaid.pdf")
-hist(total$mean_kincaid)
+pdf("hist_median_kincaid.pdf")
+hist(total$median_kincaid)
 dev.off()
 
-pdf("hist_mean_num_im.pdf")
-hist(total$mean_num_im)
+pdf("hist_median_num_im.pdf")
+hist(total$median_num_im)
 dev.off()
 
-pdf("hist_mean_asl.pdf")
-hist(total$mean_asl)
+pdf("hist_median_asl.pdf")
+hist(total$median_asl)
 dev.off()
