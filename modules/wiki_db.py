@@ -15,20 +15,28 @@ class DatabaseAccess:
 		except:
 			print("Connection failed.")
 
-	def pullArticle(self, chosenID):
+	def pullArticleByID(self, chosenID):
 		query = f"""SELECT * FROM public.article WHERE id = {chosenID}"""
 		chosenArticle = self.cursor.execute(query)
-		print(chosenArticle)
-		return chosenArticle
+		rows = self.cursor.fetchall()
+		return rows
 
-	def pullRevision(self, chosenID):
+	def pullRevisionByID(self, chosenID):
 		query = f"""SELECT * FROM public."revisionHistory" WHERE id = {chosenID}"""
 		chosenRevision = self.cursor.execute(query)
-		print(chosenRevision)
-		return chosenRevision
+		rows = self.cursor.fetchall()
+		return rows
+
+	def foreignKeyJoin(self):
+		query = f"""SELECT * FROM public.article INNER JOIN public."revisionHistory" USING (id);"""
+		return
 
 
 def main():
+	# testing = DatabaseAccess()
+	# print(testing.foreignKeyJoin())
+	# quit()
+
 	try:
 		conn = psycopg2.connect("dbname='wikipedia' user='mathcsadmin' host='127.0.0.1' password='corgiPower!'")
 	except:
@@ -63,7 +71,7 @@ def main():
 				try:
 					cur.execute(f"""INSERT INTO public."article" VALUES ({article.id}, $${article.title}$$,
 								{article.current_id}, {num_edits}, {num_unique_authors}, {author_diversity}, {age}, {currency})""")
-				except: 
+				except:
 					print(f"Error adding: {article.title}")
 				for revision in article.revisions:
 					text = article.revisions[revision].text
