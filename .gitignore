@@ -4,5 +4,6 @@
 *.xml
 *.7z
 *.csv
+*.pdf
 dumps/.Rhistory
 modules/nohup.out
