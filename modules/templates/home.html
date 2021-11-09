@@ -6,12 +6,25 @@ body {background-color: DarkSlateGray;}
 h1   {color: LightSeaGreen; text-align: center;}
 h2   {color: LightSeaGreen; text-align: center;}
 p    {color: LightSeaGreen; text-align: center;}
+label{color: LightSeaGreen; text-align: center;}
+form {text-align: center;}
+.bottom-space {
+     margin-bottom: 3cm;
+  }
 </style>
 </head>
 <body>
 
 <h1>Wiki Eval</h1>
+
 <h2>Article:</h2>
+
+<form method="POST">
+	<label for="name">Search by article ID:</label>
+    <input name="article">
+    <input type="submit" name="submit_button" value="Search Article">
+</form>
+
 <p>ID: </p>
 <p>Title: </p>
 <p>Current ID: </p>
@@ -19,7 +32,27 @@ p    {color: LightSeaGreen; text-align: center;}
 <p>Number of unique authors: </p>
 <p>Author diversity: </p>
 <p>Age: </p>
-<p>Currency: </p>
+<p class = "bottom-space">Currency: </p>
+
+<h2>Revision:</h2>
+
+<form method="POST">
+	<label for="name">Search by revision ID:</label>
+    <input name="revision">
+    <input type="submit" name="submit_button" value="Search Revision">
+</form>
+
+<p>ID: </p>
+<p>Title: </p>
+<p>Number of internal links: </p>
+<p>Number of external links: </p>
+<p>Article length: </p>
+<p>Article ID: </p>
+<p>Flesch score: </p>
+<p>Kincaid: </p>
+<p>Number of images: </p>
+<p>Average sentence length: </p>
+<p class = "bottom-space">Date of revision: </p>
 
 </body>
 </html>
