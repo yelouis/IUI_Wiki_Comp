@@ -16,25 +16,43 @@ class DatabaseAccess:
 			print("Connection failed.")
 
 	def pullArticleByID(self, chosenID):
-		query = f"""SELECT * FROM public.article WHERE id = {chosenID}"""
+		query = f"""SELECT * FROM "article" WHERE id = {chosenID}"""
 		chosenArticle = self.cursor.execute(query)
 		rows = self.cursor.fetchall()
 		return rows
 
 	def pullRevisionByID(self, chosenID):
-		query = f"""SELECT * FROM public."revisionHistory" WHERE id = {chosenID}"""
+		query = f"""SELECT * FROM "revisionHistory" WHERE revision_id = {chosenID}"""
 		chosenRevision = self.cursor.execute(query)
 		rows = self.cursor.fetchall()
 		return rows
 
-	def foreignKeyJoin(self):
-		query = f"""SELECT * FROM public.article INNER JOIN public."revisionHistory" USING (id);"""
-		return
+	def foreignKeyJoinByID(self, chosenID):
+		query = f"""SELECT * FROM "article" INNER JOIN
+		"revisionHistory" ON "article".id = "revisionHistory".article_id
+		WHERE "article".id = {chosenID}"""
+		chosenQuery = self.cursor.execute(query)
+		rows = self.cursor.fetchall()
+		return rows
+
+	def article_id_join_search(self, chosenID):
+		query = f"""SELECT * FROM "article" INNER JOIN
+		"revisionHistory" ON "article".id = "revisionHistory".article_id
+		WHERE "article".id = {chosenID}"""
+		chosenQuery = self.cursor.execute(query)
+		rows = self.cursor.fetchall()
+		return rows
+
+	def title_join_search(self, title):
+		query = f"""SELECT * FROM "article" NATURAL JOIN "revisionHistory" WHERE title = '{title}'"""
+		chosenQuery = self.cursor.execute(query)
+		rows = self.cursor.fetchall()
+		return rows
 
 
 def main():
 	# testing = DatabaseAccess()
-	# print(testing.foreignKeyJoin())
+	# print(testing.title_join_search("April"))
 	# quit()
 
 	try:
