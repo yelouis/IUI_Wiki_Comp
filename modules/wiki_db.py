@@ -51,9 +51,9 @@ class DatabaseAccess:
 
 
 def main():
-	# testing = DatabaseAccess()
-	# print(testing.title_join_search("April"))
-	# quit()
+	testing = DatabaseAccess()
+	print(testing.title_join_search("April"))
+	quit()
 
 	try:
 		conn = psycopg2.connect("dbname='wikipedia' user='mathcsadmin' host='127.0.0.1' password='corgiPower!'")
