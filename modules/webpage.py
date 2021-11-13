@@ -17,15 +17,21 @@ def my_form_post():
 	if request.form['submit_button'] == "Search Article":
 		text = request.form['article']
 		processed_text = text.upper()
-		print(processed_text)
 		# when we pull article by title, do API disambiguation, then if there's
 		# only 1 option, pass that as parameter to psycopg2, otherwise, pass first option?
-		listOfTuples = access.pullArticleByID(processed_text)
+
+		data = access.pullArticleByID(processed_text)
+		return render_template("home.html", article_data=data)
+
 	elif request.form['submit_button'] == "Search Revision":
 		text = request.form['revision']
 		processed_text = text.upper()
 		print(processed_text)
-		listOfTuples = access.pullRevisionByID(processed_text)
+
+		data = access.pullRevisionByID(processed_text)
+		print("data: ", data)
+		return render_template("home.html", revision_data=data)
+
 	return render_template("home.html")
 
 if __name__ == "__main__":
