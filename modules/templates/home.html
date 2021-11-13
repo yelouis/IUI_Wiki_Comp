@@ -9,8 +9,17 @@ p    {color: LightSeaGreen; text-align: center;}
 label{color: LightSeaGreen; text-align: center;}
 form {text-align: center;}
 .bottom-space {
-     margin-bottom: 3cm;
+     margin-bottom: 1cm;
   }
+.flex-container {
+    display: flex;
+}
+.flex-child {
+    flex: 1;
+}
+.flex-child:first-child {
+    margin-right: 20px;
+}
 </style>
 </head>
 <body>
@@ -25,14 +34,35 @@ form {text-align: center;}
     <input type="submit" name="submit_button" value="Search Article">
 </form>
 
-<p>ID: </p>
-<p>Title: </p>
-<p>Current ID: </p>
-<p>Number of edits: </p>
-<p>Number of unique authors: </p>
-<p>Author diversity: </p>
-<p>Age: </p>
-<p class = "bottom-space">Currency: </p>
+<p class = "bottom-space"> </p>
+
+<div class="flex-container">
+  <div class="flex-child magenta">
+    <p>ID: </p>
+    <p>Title: </p>
+    <p>Current ID: </p>
+    <p>Number of edits: </p>
+    <p>Number of unique authors: </p>
+    <p>Author diversity: </p>
+    <p>Age: </p>
+    <p>Currency: </p>
+  </div>
+
+  <div class="flex-child green" id='info_section'>
+      {% for data in article_data %}
+          <p>{{ data[0] }}</p>
+          <p>{{ data[1] }}</p>
+          <p>{{ data[2] }}</p>
+          <p>{{ data[3] }}</p>
+          <p>{{ data[4] }}</p>
+          <p>{{ data[5] }}</p>
+          <p>{{ data[6] }}</p>
+          <p>{{ data[7] }}</p>
+      {% endfor %}
+  </div>
+</div>
+
+<p class = "bottom-space"> </p>
 
 <h2>Revision:</h2>
 
@@ -42,17 +72,41 @@ form {text-align: center;}
     <input type="submit" name="submit_button" value="Search Revision">
 </form>
 
-<p>ID: </p>
-<p>Title: </p>
-<p>Number of internal links: </p>
-<p>Number of external links: </p>
-<p>Article length: </p>
-<p>Article ID: </p>
-<p>Flesch score: </p>
-<p>Kincaid: </p>
-<p>Number of images: </p>
-<p>Average sentence length: </p>
-<p class = "bottom-space">Date of revision: </p>
+<p class = "bottom-space"> </p>
+
+<div class="flex-container">
+  <div class="flex-child magenta">
+    <p>ID: </p>
+    <p>Title: </p>
+    <p>Number of internal links: </p>
+    <p>Number of external links: </p>
+    <p>Article length: </p>
+    <p>Article ID: </p>
+    <p>Flesch score: </p>
+    <p>Kincaid: </p>
+    <p>Number of images: </p>
+    <p>Average sentence length: </p>
+    <p>Date of revision: </p>
+  </div>
+
+  <div class="flex-child green" id='info_section'>
+      {% for data in revision_data %}
+          <p>{{ data[0] }}</p>
+          <p>{{ data[1] }}</p>
+          <p>{{ data[2] }}</p>
+          <p>{{ data[3] }}</p>
+          <p>{{ data[4] }}</p>
+          <p>{{ data[5] }}</p>
+          <p>{{ data[6] }}</p>
+          <p>{{ data[7] }}</p>
+          <p>{{ data[8] }}</p>
+          <p>{{ data[9] }}</p>
+          <p>{{ data[10] }}</p>
+      {% endfor %}
+  </div>
+</div>
+
+<p class = "bottom-space"> </p>
 
 </body>
 </html>
