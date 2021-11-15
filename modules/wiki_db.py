@@ -65,9 +65,9 @@ def main():
 	wiki_dump = wd.XMLDumpParser("../dumps/simplewiki-latest-pages-meta-history.xml.bz2")
 
 	# ITERATE TO LATEST ARTICLE ADDED, PROBABLY GEA
-	parse_start = time.time()
+	parse_start = time.perf_counter()
 	count = wiki_dump.iterate_past_page("GEA")
-	parse_end = time.time()
+	parse_end = time.perf_counter()
 	print(f"{parse_end - parse_start} seconds to iterate past {count} articles.")
 
 	amount = 10
@@ -76,7 +76,7 @@ def main():
 	inserts = {1} # dummy dict for while loop start
 
 	while len(inserts) > 0:
-		parse_start = time.time()
+		parse_start = time.perf_counter()
 		inserts = wiki_dump.parse_n_pages(amount)
 		for article in inserts.values():
 			num_edits = article.get_score("num_edits")
@@ -113,9 +113,9 @@ def main():
 						except:
 							# print(f"Error adding: {article.title}: {revision=}")
 							pass
-		parse_end = time.time()
+		parse_end = time.perf_counter()
 		conn.commit()
-		commit_end = time.time()
+		commit_end = time.perf_counter()
 		num_commits += 1
 		print(f"Committed for the {num_commits}th time!")
 		print(f"Parse Time: {(parse_end - parse_start):.3f}s")
