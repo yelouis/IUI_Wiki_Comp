@@ -16,26 +16,68 @@ class DatabaseAccess:
 			print("Connection failed.")
 
 	def pullArticleByID(self, chosenID):
-		query = f"""SELECT * FROM public.article WHERE id = {chosenID}"""
+		query = f"""SELECT * FROM "article" WHERE id = {chosenID}"""
 		chosenArticle = self.cursor.execute(query)
 		rows = self.cursor.fetchall()
 		return rows
 
 	def pullRevisionByID(self, chosenID):
-		query = f"""SELECT * FROM public."revisionHistory" WHERE id = {chosenID}"""
+		query = f"""SELECT * FROM "revisionHistory" WHERE revision_id = {chosenID}"""
 		chosenRevision = self.cursor.execute(query)
 		rows = self.cursor.fetchall()
 		return rows
 
-	def foreignKeyJoin(self):
-		query = f"""SELECT * FROM public.article INNER JOIN public."revisionHistory" USING (id);"""
-		return
+	def foreignKeyJoinByID(self, chosenID):
+		query = f"""SELECT * FROM "article" INNER JOIN
+		"revisionHistory" ON "article".id = "revisionHistory".article_id
+		WHERE "article".id = {chosenID}"""
+		chosenQuery = self.cursor.execute(query)
+		rows = self.cursor.fetchall()
+		return rows
+
+	def article_id_join_search(self, chosenID):
+		query = f"""SELECT * FROM "article" INNER JOIN
+		"revisionHistory" ON "article".id = "revisionHistory".article_id
+		WHERE "article".id = {chosenID}"""
+		chosenQuery = self.cursor.execute(query)
+		rows = self.cursor.fetchall()
+		return rows
+
+	def title_join_search(self, title):
+		query = f"""SELECT * FROM "article" NATURAL JOIN "revisionHistory" WHERE title = '{title}'"""
+		chosenQuery = self.cursor.execute(query)
+		rows = self.cursor.fetchall()
+		return rows
+
+	def addColumnToTable(self, columnName, columnType, tableName):
+		query = f"""ALTER TABLE "{tableName}" ADD {columnName} {columnType}"""
+		chosenQuery = self.cursor.execute(query)
+		self.conn.commit()
+		return chosenQuery
+
+	def dropColumn(self, columnName, tableName):
+		query = f"""ALTER TABLE "{tableName}" DROP COLUMN {columnName}"""
+		chosenQuery = self.cursor.execute(query)
+		self.conn.commit()
+		return chosenQuery
+
+
+	# Update Tutorial
+	#
+	# UPDATE table_name
+	# SET column1 = value1, column2 = value2, ...
+	# WHERE condition;
+	#
+	# UPDATE Customers
+	# SET ContactName = 'Alfred Schmidt', City= 'Frankfurt'
+	# WHERE CustomerID = 1;
+
 
 
 def main():
-	# testing = DatabaseAccess()
-	# print(testing.foreignKeyJoin())
-	# quit()
+	testing = DatabaseAccess()
+	print(testing.dropColumn("Email", "article"))
+	quit()
 
 	try:
 		conn = psycopg2.connect("dbname='wikipedia' user='mathcsadmin' host='127.0.0.1' password='corgiPower!'")
@@ -47,9 +89,9 @@ def main():
 	wiki_dump = wd.XMLDumpParser("../dumps/simplewiki-latest-pages-meta-history.xml.bz2")
 
 	# ITERATE TO LATEST ARTICLE ADDED, PROBABLY GEA
-	parse_start = time.time()
+	parse_start = time.perf_counter()
 	count = wiki_dump.iterate_past_page("GEA")
-	parse_end = time.time()
+	parse_end = time.perf_counter()
 	print(f"{parse_end - parse_start} seconds to iterate past {count} articles.")
 
 	amount = 10
@@ -58,7 +100,7 @@ def main():
 	inserts = {1} # dummy dict for while loop start
 
 	while len(inserts) > 0:
-		parse_start = time.time()
+		parse_start = time.perf_counter()
 		inserts = wiki_dump.parse_n_pages(amount)
 		for article in inserts.values():
 			num_edits = article.get_score("num_edits")
@@ -95,9 +137,9 @@ def main():
 						except:
 							# print(f"Error adding: {article.title}: {revision=}")
 							pass
-		parse_end = time.time()
+		parse_end = time.perf_counter()
 		conn.commit()
-		commit_end = time.time()
+		commit_end = time.perf_counter()
 		num_commits += 1
 		print(f"Committed for the {num_commits}th time!")
 		print(f"Parse Time: {(parse_end - parse_start):.3f}s")

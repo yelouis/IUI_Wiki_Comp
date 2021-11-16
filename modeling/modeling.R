@@ -98,12 +98,17 @@ describe(summary_df, fast=TRUE)
 
 total$prediction <- predict(total.glm.red4, newdata = total, type = "response")
 
+hist(total$prediction)
+
+hist(log(total$prediction) - min(log(total$prediction), na.rm=TRUE))
+
 # EDA
 
 cor(total)
 
 pdf("hist_num_edits.pdf")
 hist(total$num_edits)
+hist(log(total$num_edits))
 dev.off()
 
 pdf("hist_num_unique_authors.pdf")
