@@ -53,7 +53,7 @@ class DatabaseAccess:
 		query = f"""ALTER TABLE "{tableName}" ADD {columnName} {columnType}"""
 		print(query)
 		chosenQuery = self.cursor.execute(query)
-		self.cursor.commit()
+		self.conn.commit()
 		return chosenQuery
 
 
