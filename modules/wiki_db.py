@@ -58,7 +58,7 @@ class DatabaseAccess:
 
 def main():
 	testing = DatabaseAccess()
-	print(testing.addColumnToTable("Email", "varchar(255)", "Article"))
+	print(testing.addColumnToTable("Email", "varchar(255)", "article"))
 	quit()
 
 	try:
