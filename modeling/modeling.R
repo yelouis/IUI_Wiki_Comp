@@ -1,6 +1,7 @@
 library(tidyverse)
 library(RPostgreSQL)
 library(car)
+library(jtools)
 
 con <- dbConnect(drv=PostgreSQL(),
                  user="mathcsadmin",
@@ -9,7 +10,7 @@ con <- dbConnect(drv=PostgreSQL(),
                  dbname="wikipedia")
 
 articles <- dbGetQuery(con, "SELECT * FROM public.article;")
-revisions <- dbGetQuery(con, 'SELECT id,title,num_internal_links,num_external_links,article_length,article_id,flesch,kincaid,num_images,average_sentence_length,date FROM public."revisionHistory";')
+revisions <- dbGetQuery(con, 'SELECT revision_id,title,num_internal_links,num_external_links,article_length,article_id,flesch,kincaid,num_images,average_sentence_length,date FROM public."revisionHistory";')
 
 vg_articles <- c("1910 Cuba hurricane","American Airlines Flight 11","Baseball uniform","City of Manchester Stadium","Mourning dove","Evolution","Hermann Göring","Gothic architecture","Billy Graham","Hurricane Vince","Ipswich Town F.C.","Jupiter","Dan Kelly","Kingsway tramway subway","Lawrence, Kansas","The Lightning Thief","Commodore Nutt","Portman Road","Powderfinger","Ronald Reagan","Red Hot Chili Peppers","Bobby Robson","Saturn","Le Spectre de la rose","Tropical Depression Ten (2005)","Tropical Storm Barry (2007)","Tropical Storm Gabrielle (2007)")
 g_articles <- c("Grand Duchess Anastasia Nikolaevna of Russia", "Fra Angelico", "Bald eagle", "Jean Balukas", "Ludwig van Beethoven", "Bird", "Black hole", "Bloc Party", "Wernher von Braun", "Bridge to Terabithia (2007 movie)", "Oyster Burns", "Carom billiards", "Cassowary", "Chess", "Chopsticks", "Color blindness", "Color of the day (police)", "Common scold", "Jeremy Corbyn", "Crater Lake", "Crich Tramway Village", "Bobby Dodd", "Bobby Fischer", "Geisha", "Gettysburg Address", "Giant panda", "Valéry Giscard d'Estaing", "Goodfellow's tree-kangaroo", "Hurricane Grace (1991)", "Green Day", "Ben Hall", "Hanami", "Hebrew calendar", "History of Kansas", "Hot chocolate", "Hurricane Floyd (1987)", "India", "Tropical Storm Ingrid (2007)", "Hurricane Ismael", "Japanese American internment", "Ned Kelly", "Knut (polar bear)", "Komodo dragon", "Lawrence massacre", "Least weasel", "London Underground 1967 Stock", "London Underground 2009 Stock", "Mimicry", "Monarch butterfly", "Mosque", "Movie Stars", "Neptune", "New York State Route 308", "The Nutcracker", "Alexandria Ocasio-Cortez", "Oxalaia", "Presidents' Trophy", "Fred Rogers", "Ernst Röhm", "Royal Rumble (2009)", "St. Peter's Basilica", "Bernie Sanders", "The Sea of Monsters", "Selena (album)", "Sentō", "Shabbat", "Shipping Forecast", "Singapore", "Skite (album)", "John McDouall Stuart", "Typhoon Tip", "The Titan's Curse", "Tropical Storm Arthur (2020)", "Trouble (Coldplay song)", "Victoria line", "Wheeling Tunnel", "Yellow (song)", "Zinc")
@@ -72,6 +73,26 @@ dev.off()
 pdf("4_resid.pdf")
 plot(total.glm.red4, which = 1)
 dev.off()
+
+pdf("4_coefs.pdf")
+plot_coefs(total.glm.red4, to.file = "pdf", file.name = "4_coefs2.pdf")
+dev.off()
+
+summary_data <- total %>% 
+  mutate(log_num_edits = log(num_edits),
+         log_age = log(age),
+         log_median_nil = log(median_nil + 1),
+         log_median_nel = log(median_nel + 1),
+         log_median_len = log(median_len + 1),
+         log_median_num_im = log(median_num_im + 1)) %>%
+  select(log_num_edits, author_diversity, log_age, log_median_nil,
+         log_median_nel, log_median_len, median_flesch, log_median_num_im)
+
+summary_df <- as.data.frame(summary_data)
+
+library(psych)
+
+describe(summary_df, fast=TRUE)
 
 # prediction
 
