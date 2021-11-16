@@ -51,7 +51,12 @@ class DatabaseAccess:
 
 	def addColumnToTable(self, columnName, columnType, tableName):
 		query = f"""ALTER TABLE "{tableName}" ADD {columnName} {columnType}"""
-		print(query)
+		chosenQuery = self.cursor.execute(query)
+		self.conn.commit()
+		return chosenQuery
+
+	def dropColumn(self, columnName, tableName):
+		query = f"""ALTER TABLE "{tableName}" DROP COLUMN columnName"""
 		chosenQuery = self.cursor.execute(query)
 		self.conn.commit()
 		return chosenQuery
@@ -60,7 +65,7 @@ class DatabaseAccess:
 
 def main():
 	testing = DatabaseAccess()
-	print(testing.addColumnToTable("Email", "varchar(255)", "article"))
+	print(testing.dropColumn("Email", "article"))
 	quit()
 
 	try:
