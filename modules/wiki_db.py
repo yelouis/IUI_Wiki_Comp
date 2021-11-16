@@ -50,9 +50,10 @@ class DatabaseAccess:
 		return rows
 
 	def addColumnToTable(self, columnName, columnType, tableName):
-		query = f"""ALTER TABLE "{tableName}" ADD {columnName} {columnType};"""
+		query = f"""ALTER TABLE "{tableName}" ADD {columnName} {columnType}"""
 		print(query)
 		chosenQuery = self.cursor.execute(query)
+		self.cursor.commit()
 		return chosenQuery
 
 
