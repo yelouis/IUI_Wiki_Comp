@@ -49,10 +49,16 @@ class DatabaseAccess:
 		rows = self.cursor.fetchall()
 		return rows
 
+	def addColumnToTable(self, columnName, columnType, tableName):
+		query = f"""ALTER TABLE "{tableName}" ADD {columnName} {columnType}"""
+		chosenQuery = self.cursor.execute(query)
+		return chosenQuery
+
+
 
 def main():
 	testing = DatabaseAccess()
-	print(testing.title_join_search("April"))
+	print(testing.addColumnToTable("Email", "varchar(255)", "Article"))
 	quit()
 
 	try:
