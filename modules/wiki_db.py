@@ -56,7 +56,7 @@ class DatabaseAccess:
 		return chosenQuery
 
 	def dropColumn(self, columnName, tableName):
-		query = f"""ALTER TABLE "{tableName}" DROP COLUMN columnName"""
+		query = f"""ALTER TABLE "{tableName}" DROP COLUMN {columnName}"""
 		chosenQuery = self.cursor.execute(query)
 		self.conn.commit()
 		return chosenQuery
