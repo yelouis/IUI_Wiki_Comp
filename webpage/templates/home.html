@@ -2,15 +2,24 @@
 <html>
 <head>
 <style>
+
+/* All styling will be done here as we are not using a seperate CSS file */
+
 body {background-color: DarkSlateGray;}
 h1   {color: LightSeaGreen; text-align: center;}
 h2   {color: LightSeaGreen; text-align: center;}
 p    {color: LightSeaGreen; text-align: center;}
 label{color: LightSeaGreen; text-align: center;}
 form {text-align: center;}
+.left-text {
+     color: LightSeaGreen; text-align: right;
+}
+.right-text {
+     color: LightSeaGreen; text-align: left;
+}
 .bottom-space {
      margin-bottom: 1cm;
-  }
+}
 .flex-container {
     display: flex;
 }
@@ -28,6 +37,8 @@ form {text-align: center;}
 
 <h2>Article:</h2>
 
+<!-- POST allows us to get user input and handle it in webpage.py -->
+
 <form method="POST">
 	<label for="name">Search by article ID:</label>
     <input name="article">
@@ -38,26 +49,26 @@ form {text-align: center;}
 
 <div class="flex-container">
   <div class="flex-child magenta">
-    <p>ID: </p>
-    <p>Title: </p>
-    <p>Current ID: </p>
-    <p>Number of edits: </p>
-    <p>Number of unique authors: </p>
-    <p>Author diversity: </p>
-    <p>Age: </p>
-    <p>Currency: </p>
+    <p class="left-text">ID: </p>
+    <p class="left-text">Title: </p>
+    <p class="left-text">Current ID: </p>
+    <p class="left-text">Number of edits: </p>
+    <p class="left-text">Number of unique authors: </p>
+    <p class="left-text">Author diversity: </p>
+    <p class="left-text">Age: </p>
+    <p class="left-text">Currency: </p>
   </div>
 
   <div class="flex-child green" id='info_section'>
       {% for data in article_data %}
-          <p>{{ data[0] }}</p>
-          <p>{{ data[1] }}</p>
-          <p>{{ data[2] }}</p>
-          <p>{{ data[3] }}</p>
-          <p>{{ data[4] }}</p>
-          <p>{{ data[5] }}</p>
-          <p>{{ data[6] }}</p>
-          <p>{{ data[7] }}</p>
+          <p class="right-text">{{ data[0] }}</p>
+          <p class="right-text">{{ data[1] }}</p>
+          <p class="right-text">{{ data[2] }}</p>
+          <p class="right-text">{{ data[3] }}</p>
+          <p class="right-text">{{ data[4] }}</p>
+          <p class="right-text">{{ data[5] }}</p>
+          <p class="right-text">{{ data[6] }}</p>
+          <p class="right-text">{{ data[7] }}</p>
       {% endfor %}
   </div>
 </div>
@@ -76,32 +87,32 @@ form {text-align: center;}
 
 <div class="flex-container">
   <div class="flex-child magenta">
-    <p>ID: </p>
-    <p>Title: </p>
-    <p>Number of internal links: </p>
-    <p>Number of external links: </p>
-    <p>Article length: </p>
-    <p>Article ID: </p>
-    <p>Flesch score: </p>
-    <p>Kincaid: </p>
-    <p>Number of images: </p>
-    <p>Average sentence length: </p>
-    <p>Date of revision: </p>
+    <p class="left-text">ID: </p>
+    <p class="left-text">Title: </p>
+    <p class="left-text">Number of internal links: </p>
+    <p class="left-text">Number of external links: </p>
+    <p class="left-text">Article length: </p>
+    <p class="left-text">Article ID: </p>
+    <p class="left-text">Flesch score: </p>
+    <p class="left-text">Kincaid: </p>
+    <p class="left-text">Number of images: </p>
+    <p class="left-text">Average sentence length: </p>
+    <p class="left-text">Date of revision: </p>
   </div>
 
   <div class="flex-child green" id='info_section'>
       {% for data in revision_data %}
-          <p>{{ data[0] }}</p>
-          <p>{{ data[1] }}</p>
-          <p>{{ data[2] }}</p>
-          <p>{{ data[3] }}</p>
-          <p>{{ data[4] }}</p>
-          <p>{{ data[5] }}</p>
-          <p>{{ data[6] }}</p>
-          <p>{{ data[7] }}</p>
-          <p>{{ data[8] }}</p>
-          <p>{{ data[9] }}</p>
-          <p>{{ data[10] }}</p>
+          <p class="right-text">{{ data[0] }}</p>
+          <p class="right-text">{{ data[1] }}</p>
+          <p class="right-text">{{ data[2] }}</p>
+          <p class="right-text">{{ data[3] }}</p>
+          <p class="right-text">{{ data[4] }}</p>
+          <p class="right-text">{{ data[5] }}</p>
+          <p class="right-text">{{ data[6] }}</p>
+          <p class="right-text">{{ data[7] }}</p>
+          <p class="right-text">{{ data[8] }}</p>
+          <p class="right-text">{{ data[9] }}</p>
+          <p class="right-text">{{ data[10] }}</p>
       {% endfor %}
   </div>
 </div>
