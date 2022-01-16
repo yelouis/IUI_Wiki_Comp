@@ -1,5 +1,9 @@
-import wiki_db as db
 from flask import Flask, request, render_template
+import sys
+
+sys.path.insert(1, '../modules')
+
+import wiki_db as db
 
 access = db.DatabaseAccess()
 

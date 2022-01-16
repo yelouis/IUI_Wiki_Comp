@@ -189,12 +189,15 @@ class XMLDumpParser:
                         revision.date = datetime.strptime(elem.text, "%Y-%m-%dT%H:%M:%SZ")
 
                 elif tag == "contributor":
-                    a_name, a_id = self._parse_author()
-                    if a_name:
-                        revision.author_name = a_name
+                    author_name, author_id, author_ip = self._parse_author()
+                    if author_name:
+                        revision.author_name = author_name
 
-                    if a_id:
-                        revision.author_id = a_id
+                    if author_id:
+                        revision.author_id = author_id
+
+                    if author_ip:
+                        revision.author_ip = author_ip
 
                 elif tag == "text":
                     if not elem.text:
@@ -232,7 +235,7 @@ class XMLDumpParser:
     # continues xml context and parses a single <contributor> tag
     # SIDE EFFECT: iterates xml_context
     def _parse_author(self) -> Tuple[str, int]:
-        username, id = "", -1
+        username, id, ip = "", -1, ""
 
         for event, elem in self.xml_context:
             tag = elem.tag.split("}")[1]
@@ -243,13 +246,16 @@ class XMLDumpParser:
                 elif tag == "id":
                     id = elem.text
 
+                elif tag == "ip":
+                    ip = elem.text
+
             elif tag == "contributor" and event == "end":
                 elem.clear()
-                return username, id
+                return username, id, ip
 
             elem.clear()
 
-        return username, id
+        return username, id, ip
 
 def main():
     DUMP_FILE = '../dumps/simplewiki-latest-pages-meta-history.xml.bz2'

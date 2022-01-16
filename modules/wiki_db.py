@@ -74,7 +74,56 @@ class DatabaseAccess:
 
 
 
-def main():
+def add_columns():
+	testing = DatabaseAccess()
+
+	try:
+		conn = psycopg2.connect("dbname='wikipedia' user='mathcsadmin' host='127.0.0.1' password='corgiPower!'")
+	except:
+		print("I am unable to connect to the database")
+
+	cur = conn.cursor()
+
+	wiki_dump = wd.XMLDumpParser("../dumps/simplewiki-latest-pages-meta-history.xml.bz2")
+
+	amount = 10
+	num_commits = 0
+
+	inserts = {1} # dummy dict for while loop start
+
+	while len(inserts) > 0:
+		parse_start = time.perf_counter()
+		inserts = wiki_dump.parse_n_pages(amount)
+		for article in inserts.values():
+
+			if article.id != -1:
+				for revision in article.revisions:
+					revision_id = article.revisions[revision].id
+					author_name = article.revisions[revision].author_name
+
+					if "$$" in author_name:
+						author_name.replace("$$", "")
+
+					author_id = article.revisions[revision].author_id
+					author_ip = article.revisions[revision].author_ip
+
+					if revision_id != -1:
+						try:
+							cur.execute(f"""UPDATE public."revisionHistory" SET a_name = $${author_name}$$, a_id = {author_id}, a_ip = $${author_ip}$$ WHERE revision_id = {revision_id}""")
+						except psycopg2.Error as e:
+							print(e)
+							quit()
+		parse_end = time.perf_counter()
+		conn.commit()
+		commit_end = time.perf_counter()
+		num_commits += 1
+		print(f"Committed for the {num_commits}th time!")
+		print(f"Parse Time: {(parse_end - parse_start):.3f}s")
+		print(f"Commit Time: {(commit_end - parse_end):.3f}s")
+
+	conn.commit()
+
+def populate():
 	testing = DatabaseAccess()
 	print(testing.dropColumn("Email", "article"))
 	quit()
@@ -161,4 +210,4 @@ def main():
 	print(rows)
 
 if __name__=="__main__":
-	main()
+	add_columns()

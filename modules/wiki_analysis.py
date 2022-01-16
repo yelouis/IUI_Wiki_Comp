@@ -88,6 +88,7 @@ class WikipediaRevision:
     scores: dict[str, float]
     author_name: str = "N/A"
     author_id: int = -1
+    author_ip: str = "N/A"
     raw_text: str = "N/A"
     text: str = "N/A"
 
