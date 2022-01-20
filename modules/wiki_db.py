@@ -101,8 +101,7 @@ def add_columns():
 					revision_id = article.revisions[revision].id
 					author_name = article.revisions[revision].author_name
 
-					if "$$" in author_name:
-						author_name.replace("$$", "")
+					author_name = author_name.replace("$", "")
 
 					author_id = article.revisions[revision].author_id
 					author_ip = article.revisions[revision].author_ip
