@@ -61,6 +61,18 @@ class DatabaseAccess:
 		self.conn.commit()
 		return chosenQuery
 
+	def getArticleAuthors(self, ID):
+		authors = set()
+		revisions = self.article_id_join_search(ID)
+		for revision in revisions:
+			if(revision[11] is not None): # we may be referencing the wrong columns here 
+				authors.add(revision[11]) # we think 11 is for a_name
+			elif(revision[12] is not None):
+				authors.add(revision[12]) # we think 12 is for a_ID
+			else:
+				authors.add(revision[13]) # we think 13 is for a_IP
+
+
 
 	# Update Tutorial
 	#
