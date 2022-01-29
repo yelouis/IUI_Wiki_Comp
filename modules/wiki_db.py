@@ -6,7 +6,7 @@ import wiki_dump as wd
 
 class DatabaseAccess:
 	conn: Optional[psycopg2.connection] = None
-	cursors: Optional[psycopg2.cursor] = None
+	cursor: Optional[psycopg2.cursor] = None
 
 	def __init__(self):
 		try:
@@ -77,12 +77,7 @@ class DatabaseAccess:
 def add_columns():
 	testing = DatabaseAccess()
 
-	try:
-		conn = psycopg2.connect("dbname='wikipedia' user='mathcsadmin' host='127.0.0.1' password='corgiPower!'")
-	except:
-		print("I am unable to connect to the database")
-
-	cur = conn.cursor()
+	cur = testing.cursor
 
 	wiki_dump = wd.XMLDumpParser("../dumps/simplewiki-latest-pages-meta-history.xml.bz2")
 
