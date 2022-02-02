@@ -1,7 +1,12 @@
 import psycopg2
+from nltk.corpus import stopwords
+from nltk.corpus import words
+stopWords = set(stopwords.words('english'))
+wordlist = words.words()
 
 
 class QuoteScore:
+
 
     def __init__(self, text):
         self.corpus = text
@@ -10,20 +15,37 @@ class QuoteScore:
 
 
 
-    # def dataCleaning(self):
-    #     self.removePunctuation()
-    #
-    #
-    #     self.removeNumber()
-    #     self.removeProperNouns()
-    #     self.removeStopWords()
-    #     self.validateWithNLTK()
+    def dataCleaning(self):
+        self.removePunctuationNum()
+        self.quoteDetection()
+        self.quoteCleaning()
 
-    def removePunctuation(self):
+    def quoteCleaning(self):
+        newInQuote = []
+        for word_ele in self.inQuote:
+            # Remove words that are stopwords, is a proper noun (by cap), or not in the wordList of NLTK
+            if (word_ele in stopWords or word_ele[0].isupper()) and word_ele not in wordList:
+                continue
+            else:
+                newInQuote.append(word_ele.lower())
+        self.inQuote = newInQuote
+
+        newNonQuote = []
+        for word_ele in self.nonQuote:
+            if (word_ele in stopWords or word_ele[0].isupper()) and word_ele not in wordList:
+                continue
+            else:
+                newNonQuote.append(word_ele.lower())
+        self.nonQuote = newNonQuote
+
+    def removePunctuationNum(self):
         punc = '''!()-[]{};:\,<>./?@#$%^&*_~'''
         for character in self.corpus:
             if character in punc:
                 self.corpus = self.corpus.replace(character, "")
+
+        for i in range(9):
+            self.corpus = self.corpus.replace(str(i), "")
 
     def quoteDetection(self):
         quotationMark = "\"\'"
@@ -73,8 +95,7 @@ class QuoteScore:
                     if not openQuote:
                         self.nonQuote.append(stripped_word)
 
-newQuote = QuoteScore("Hi my name is 'Louis asdfa'sdf sad$%^'gasdf'!")
-newQuote.removePunctuation()
-newQuote.quoteDetection()
+newQuote = QuoteScore("agf345biDAGFsdofao 'a56sdgdf' adsuhfg676543adjkf 'retgfs'")
+newQuote.dataCleaning()
 print(newQuote.inQuote)
 print(newQuote.nonQuote)
