@@ -12,9 +12,6 @@ con <- dbConnect(drv=PostgreSQL(),
 articles <- dbGetQuery(con, "SELECT * FROM public.article;")
 revisions <- dbGetQuery(con, 'SELECT revision_id,title,num_internal_links,num_external_links,article_length,article_id,flesch,kincaid,num_images,average_sentence_length,date FROM public."revisionHistory";')
 
-vg_articles <- c("1910 Cuba hurricane","American Airlines Flight 11","Baseball uniform","City of Manchester Stadium","Mourning dove","Evolution","Hermann Göring","Gothic architecture","Billy Graham","Hurricane Vince","Ipswich Town F.C.","Jupiter","Dan Kelly","Kingsway tramway subway","Lawrence, Kansas","The Lightning Thief","Commodore Nutt","Portman Road","Powderfinger","Ronald Reagan","Red Hot Chili Peppers","Bobby Robson","Saturn","Le Spectre de la rose","Tropical Depression Ten (2005)","Tropical Storm Barry (2007)","Tropical Storm Gabrielle (2007)")
-g_articles <- c("Grand Duchess Anastasia Nikolaevna of Russia", "Fra Angelico", "Bald eagle", "Jean Balukas", "Ludwig van Beethoven", "Bird", "Black hole", "Bloc Party", "Wernher von Braun", "Bridge to Terabithia (2007 movie)", "Oyster Burns", "Carom billiards", "Cassowary", "Chess", "Chopsticks", "Color blindness", "Color of the day (police)", "Common scold", "Jeremy Corbyn", "Crater Lake", "Crich Tramway Village", "Bobby Dodd", "Bobby Fischer", "Geisha", "Gettysburg Address", "Giant panda", "Valéry Giscard d'Estaing", "Goodfellow's tree-kangaroo", "Hurricane Grace (1991)", "Green Day", "Ben Hall", "Hanami", "Hebrew calendar", "History of Kansas", "Hot chocolate", "Hurricane Floyd (1987)", "India", "Tropical Storm Ingrid (2007)", "Hurricane Ismael", "Japanese American internment", "Ned Kelly", "Knut (polar bear)", "Komodo dragon", "Lawrence massacre", "Least weasel", "London Underground 1967 Stock", "London Underground 2009 Stock", "Mimicry", "Monarch butterfly", "Mosque", "Movie Stars", "Neptune", "New York State Route 308", "The Nutcracker", "Alexandria Ocasio-Cortez", "Oxalaia", "Presidents' Trophy", "Fred Rogers", "Ernst Röhm", "Royal Rumble (2009)", "St. Peter's Basilica", "Bernie Sanders", "The Sea of Monsters", "Selena (album)", "Sentō", "Shabbat", "Shipping Forecast", "Singapore", "Skite (album)", "John McDouall Stuart", "Typhoon Tip", "The Titan's Curse", "Tropical Storm Arthur (2020)", "Trouble (Coldplay song)", "Victoria line", "Wheeling Tunnel", "Yellow (song)", "Zinc")
-
 revisions$num_images[revisions$num_images == -1] <- 0
 revisions$average_sentence_length[revisions$average_sentence_length == -1] <- 0
 revisions$num_internal_links[revisions$num_internal_links == -1] <- 0
@@ -31,14 +28,15 @@ summarized_rev <- revisions %>%
             median_asl = median(average_sentence_length, na.rm=TRUE))
 
 total <- articles %>% 
-  left_join(summarized_rev, by = c("id" = "article_id")) %>% 
-  mutate(good = ifelse(title %in% g_articles, 1, 0), 
-         vgood = ifelse(title %in% vg_articles, 1, 0),
-         gvg = good == 1 | vgood == 1)
+  left_join(summarized_rev, by = c("id" = "article_id"))
 
-total.glm.nolog <- glm(gvg ~ num_edits + num_unique_authors + author_diversity + age + currency + median_nil + median_nel + median_len + median_flesch + median_kincaid + median_num_im + median_asl, data = total, family = "binomial")
+nolog_form <- gvg ~ num_edits + num_unique_authors + author_diversity + age + currency + median_nil + median_nel + median_len + median_flesch + median_kincaid + median_num_im + median_asl + author_density + author_score
 
-total.glm <- glm(gvg ~ log(num_edits) + log(num_unique_authors) + author_diversity + log(age) + log(currency) + log(median_nil + 1) + log(median_nel + 1) + log(median_len + 1) + median_flesch + median_kincaid + log(median_num_im + 1) + log(median_asl + 1), data = total, family = "binomial")
+log_form <- gvg ~ log(num_edits) + log(num_unique_authors) + author_diversity + log(age) + log(currency) + log(median_nil + 1) + log(median_nel + 1) + log(median_len + 1) + median_flesch + median_kincaid + log(median_num_im + 1) + log(median_asl + 1) + log(author_density + 1) + log(author_score + 1)
+
+total.glm.nolog <- glm(nolog_form, data = total, family = "binomial")
+
+total.glm <- glm(log_form, data = total, family = "binomial")
 
 summary(total.glm)
 
