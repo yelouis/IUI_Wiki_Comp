@@ -7,6 +7,8 @@ WHERE A.article_id = B.article_id AND
       F.authb = B.real_id
 GROUP BY A.article_id;
 
+UPDATE article SET author_density = 0;
+
 UPDATE article SET author_density = count 
 FROM public."author_sum" A
 WHERE id = A.article_id;

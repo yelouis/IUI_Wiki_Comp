@@ -19,3 +19,7 @@ GROUP BY rev.article_id;
 UPDATE article SET author_score = sum
 FROM public."article_author_scores" S
 WHERE id = s.article_id;
+
+UPDATE article SET article_quality = score
+FROM public."article_quality" Q
+WHERE title = Q.name;

@@ -19,7 +19,18 @@ revisions$num_external_links[revisions$num_external_links == -1] <- 0
 
 summarized_rev <- revisions %>%
   group_by(article_id) %>%
-  summarize(median_nil = median(num_internal_links, na.rm=TRUE), 
+  summarize(median_nil = median(num_internal_links, na.rm=TRUE),
+            median_nel = median(num_external_links, na.rm=TRUE),
+            median_len = median(article_length, na.rm=TRUE),
+            median_flesch = median(flesch, na.rm=TRUE),
+            median_kincaid = median(kincaid, na.rm=TRUE),
+            median_num_im = median(num_images, na.rm=TRUE), 
+            median_asl = median(average_sentence_length, na.rm=TRUE))
+
+summarized_rev_filtered <- revisions %>%
+  group_by(article_id) %>%
+  filter(flesch > 0, flesch < 100, kincaid > -3.4, kincaid < 20) %>%
+  summarize(median_nil = median(num_internal_links, na.rm=TRUE),
             median_nel = median(num_external_links, na.rm=TRUE),
             median_len = median(article_length, na.rm=TRUE),
             median_flesch = median(flesch, na.rm=TRUE),
@@ -28,7 +39,10 @@ summarized_rev <- revisions %>%
             median_asl = median(average_sentence_length, na.rm=TRUE))
 
 total <- articles %>% 
-  left_join(summarized_rev, by = c("id" = "article_id"))
+  left_join(summarized_rev_filtered, by = c("id" = "article_id")) %>%
+  mutate(gvg = as.factor(ifelse(article_quality == 0, 0, 1)),
+         article_quality = as.factor(article_quality)) %>%
+  drop_na()
 
 nolog_form <- gvg ~ num_edits + num_unique_authors + author_diversity + age + currency + median_nil + median_nel + median_len + median_flesch + median_kincaid + median_num_im + median_asl + author_density + author_score
 
@@ -39,41 +53,34 @@ total.glm.nolog <- glm(nolog_form, data = total, family = "binomial")
 total.glm <- glm(log_form, data = total, family = "binomial")
 
 summary(total.glm)
+summary(total.glm.nolog)
 
-pdf("1_influence_plot.pdf")
-influencePlot(total.glm)
-dev.off()
-
-pdf("1_resid.pdf")
-plot(total.glm, which = 1)
-dev.off()
-
-total.glm.red1 <- update(total.glm, . ~ . - log(num_unique_authors))
+total.glm.red1 <- update(total.glm, . ~ . - median_flesch)
 anova(total.glm, total.glm.red1, test="Chisq")
 summary(total.glm.red1)
 
-total.glm.red2 <- update(total.glm.red1, . ~ . - median_kincaid)
+total.glm.red2 <- update(total.glm.red1, . ~ . - log(currency))
 anova(total.glm.red2, total.glm.red1, test="Chisq")
 summary(total.glm.red2)
 
-total.glm.red3 <- update(total.glm.red2, . ~ . - log(currency))
-anova(total.glm.red2, total.glm.red3, test="Chisq")
+total.glm.red3 <- update(total.glm.red2, . ~ . - log(num_edits))
+anova(total.glm.red3, total.glm.red2, test="Chisq")
 summary(total.glm.red3)
 
-total.glm.red4 <- update(total.glm.red3, . ~ . - log(median_asl + 1))
+total.glm.red4 <- update(total.glm.red3, . ~ . - log(num_unique_authors))
 anova(total.glm.red4, total.glm.red3, test="Chisq")
 summary(total.glm.red4)
 
-pdf("4_influence_plot.pdf")
+pdf("influence_plot.pdf")
 influencePlot(total.glm.red4)
 dev.off()
 
-pdf("4_resid.pdf")
+pdf("resid.pdf")
 plot(total.glm.red4, which = 1)
 dev.off()
 
-pdf("4_coefs.pdf")
-plot_coefs(total.glm.red4, to.file = "pdf", file.name = "4_coefs2.pdf")
+pdf("coefs.pdf")
+plot_coefs(total.glm.red4)
 dev.off()
 
 summary_data <- total %>% 
