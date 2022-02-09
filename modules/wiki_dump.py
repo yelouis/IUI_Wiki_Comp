@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 from typing import Iterable, Tuple, Any, Optional, IO
 import bz2
@@ -11,6 +10,7 @@ NUM_ARTICLES = 100
 INCLUDE_NO_TEXT = False
 PRINT_PROGRESS = False
 
+
 class XMLDumpParser:
     xml_context: Iterable[Tuple[str, Any]]
     bz2_dump: Optional[IO[bytes]] = None
@@ -19,10 +19,10 @@ class XMLDumpParser:
     # decoding if it's stored as bz2
     def __init__(self, filename: str):
         if filename[-3:] == "bz2":
-            self.bz2_dump = bz2.BZ2File(filename, 'rb')
-            self.xml_context = etree.iterparse(self.bz2_dump, events=('start', 'end'))
+            self.bz2_dump = bz2.BZ2File(filename, "rb")
+            self.xml_context = etree.iterparse(self.bz2_dump, events=("start", "end"))
         elif filename[-3:] == "xml":
-            self.xml_context = etree.iterparse(filename, events=('start', 'end'))
+            self.xml_context = etree.iterparse(filename, events=("start", "end"))
         else:
             print(f"Unknown file encoding for {filename}")
 
@@ -53,7 +53,7 @@ class XMLDumpParser:
             if event == "end" and tag == "page":
                 elem.clear()
                 return count
-            
+
             elem.clear()
 
         return -1
@@ -61,12 +61,14 @@ class XMLDumpParser:
     def write_n_pages_to_csv(self, r_folder: str, filename: str, n: int) -> bool:
         articles = self.parse_n_pages(n)
         try:
-            with open(filename, 'w') as out:
-                out.write("pageId, name, currentId, parentId, numRevisions, numNoText\n")
+            with open(filename, "w") as out:
+                out.write(
+                    "pageId, name, currentId, parentId, numRevisions, numNoText\n"
+                )
                 for a in articles.values():
                     out.write(str(a))
                     r_fname = f"{r_folder}{a.id}_revisions.csv"
-                    with open(r_fname, 'w') as r_out:
+                    with open(r_fname, "w") as r_out:
                         for r in a.revisions.values():
                             r_out.write(str(r))
 
@@ -105,7 +107,11 @@ class XMLDumpParser:
                 article = self._parse_page()
                 if article:
                     articles[article.id] = article
-                    if PRINT_PROGRESS and n >= 10 and (len(articles) % int(n / 10)) == 0:
+                    if (
+                        PRINT_PROGRESS
+                        and n >= 10
+                        and (len(articles) % int(n / 10)) == 0
+                    ):
                         print(f"== {len(articles)} processed ==")
 
             if len(articles) == n:
@@ -138,7 +144,8 @@ class XMLDumpParser:
                             return None
 
                 elif tag == "id":
-                    if elem.text: article.id = int(elem.text)
+                    if elem.text:
+                        article.id = int(elem.text)
 
                 elif tag == "revision":
                     revision = self._parse_revision(article)
@@ -147,7 +154,12 @@ class XMLDumpParser:
 
             elif tag == "page" and event == "end":
                 if len(article.revisions) > 0:
-                    sorted_keys = [k for k, v in sorted(article.revisions.items(), key=lambda item: item[1].date)]
+                    sorted_keys = [
+                        k
+                        for k, v in sorted(
+                            article.revisions.items(), key=lambda item: item[1].date
+                        )
+                    ]
                     article.current_id = sorted_keys[0]
                     article.first_id = sorted_keys[-1]
                 article.calculate_scores()
@@ -174,7 +186,9 @@ class XMLDumpParser:
     # continues xml_context and parses a single <revision> tag
     # if it encounters a <contributor> tag, calls parse_author()
     # SIDE EFFECT: iterates xml_context
-    def _parse_revision(self, article: wa.WikipediaArticle) -> Optional[wa.WikipediaRevision]:
+    def _parse_revision(
+        self, article: wa.WikipediaArticle
+    ) -> Optional[wa.WikipediaRevision]:
         revision = wa.WikipediaRevision()
 
         for event, elem in self.xml_context:
@@ -186,7 +200,9 @@ class XMLDumpParser:
 
                 elif tag == "timestamp":
                     if elem.text:
-                        revision.date = datetime.strptime(elem.text, "%Y-%m-%dT%H:%M:%SZ")
+                        revision.date = datetime.strptime(
+                            elem.text, "%Y-%m-%dT%H:%M:%SZ"
+                        )
 
                 elif tag == "contributor":
                     author_name, author_id, author_ip = self._parse_author()
@@ -213,7 +229,7 @@ class XMLDumpParser:
             elif tag == "revision" and event == "end":
                 elem.clear()
                 return revision
-            
+
             elem.clear()
 
         return None
@@ -257,8 +273,9 @@ class XMLDumpParser:
 
         return username, id, ip
 
+
 def main():
-    DUMP_FILE = '../dumps/simplewiki-latest-pages-meta-history.xml.bz2'
+    DUMP_FILE = "../dumps/simplewiki-latest-pages-meta-history.xml.bz2"
 
     parser = XMLDumpParser(DUMP_FILE)
 
@@ -269,6 +286,7 @@ def main():
             print(r.scores)
         print(repr(a))
         print(a.scores)
+
 
 if __name__ == "__main__":
     main()

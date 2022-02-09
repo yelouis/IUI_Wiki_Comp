@@ -16,6 +16,7 @@ To reduce computing time, we will instead use the Simple English Wikipedia, a co
 ## Documentation
 
 `modules`: The brunt of the code
+- `modeling.R`: Backward elimination construction of a log-linear regression model to predict the likelihood that an article is good.
 - `wiki_analysis.py`:
 - `wiki_db.py`:
 - `wiki_dump.py`:
