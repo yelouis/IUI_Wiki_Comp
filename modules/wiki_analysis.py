@@ -104,7 +104,6 @@ class WikipediaRevision:
         return f"{self.id}, {self.date}, {self.author_name}, {self.author_id},\n"
 
     def process_text(self):
-        # TODO: turn wikipedia article mumbo into just text
         wikicode = mw.parse(self.raw_text)
         stripped1 = wikicode.strip_code() # removes [[page | word]] pairs and [[words]]
         stripped2 = re.sub(IMAGE_REGEX, '', stripped1) #removes [[Image:.*]]
