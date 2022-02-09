@@ -16,6 +16,8 @@ FROM public."revisionHistory" rev, public."author_scores" Q
 WHERE rev.real_id = Q.real_id
 GROUP BY rev.article_id;
 
+ALTER TABLE article ADD author_score = REAL;
+
 UPDATE article SET author_score = sum
 FROM public."article_author_scores" S
 WHERE id = s.article_id;

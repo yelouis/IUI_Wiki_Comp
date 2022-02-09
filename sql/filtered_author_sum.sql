@@ -1,3 +1,5 @@
+ALTER TABLE article ADD author_density BIGINT;
+
 CREATE TABLE author_sum AS
 SELECT A.article_id AS article_id, SUM(F.count) AS count
 FROM public."revisionHistory" A, public."revisionHistory" B, public."connectivity_graph" F

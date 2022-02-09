@@ -1,4 +1,4 @@
-ALTER TABLE article ADD full_author_density bigint;
+ALTER TABLE article ADD full_author_density BIGINT;
 
 CREATE TABLE complete_author_sum AS
 SELECT A.article_id AS article_id, SUM(F.count) AS count
