@@ -15,6 +15,8 @@ To reduce computing time, we will instead use the Simple English Wikipedia, a co
 
 ## Documentation
 
+`comps_website`: Anything related to the actual comps website.
+
 `modules`: The brunt of the code
 - `modeling.R`: Backward elimination construction of a generalized linear regression model to predict the likelihood that an article is good.
 - `wiki_analysis.py`:
@@ -22,6 +24,8 @@ To reduce computing time, we will instead use the Simple English Wikipedia, a co
 - `wiki_dump.py`:
 - `wiki_quotescore.py`:
 - `wiki_req.py`:
+
+`sql`: Any `psql` scripts used to populate database entries.
 
 `stopwords`:
 - english: A list of English stopwords (high-frequency, ignorable words).
