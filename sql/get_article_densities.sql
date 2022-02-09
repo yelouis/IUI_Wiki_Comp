@@ -3,6 +3,3 @@ FROM public."revisionHistory" A, public."revisionHistory" B
 WHERE A.article_id = B.article_id AND A.real_id != B.real_id
 GROUP BY autha, authb
 ORDER BY autha;
-
-CREATE TABLE filtered_graph AS SELECT * FROM connectivity_graph
-WHERE count > 1;
