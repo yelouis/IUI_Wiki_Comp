@@ -146,14 +146,16 @@ if __name__ == "__main__":
     articleIndexQuery = f"""select distinct(id) from "article";"""
     articleIndexList = dataAccess.freeDatabaseAccess(articleIndexQuery)
     for articleIndex in articleIndexList:
-        textQuery = f"""select date, text from "revisionHistory" where article_id = {articleIndex[0]} order by date DESC;"""
-        row = dataAccess.freeDatabaseAccess(textQuery)
-        if row[0][1] and articleIndex[0] > 23817:
-            newQuote = QuoteScore(row[0][1])
-            (inQuoteScore, nonQuoteScore) = newQuote.quoteScore()
-            updateQuery = f"""update "article" set quotescore = {inQuoteScore}, nonquotescore = {nonQuoteScore} where id = {articleIndex[0]};"""
-            dataAccess.freeCommitDatabaseAccess(updateQuery)
-            print(updateQuery)
+        if articleIndex[0] > 23817:
+            textQuery = f"""select date, text from "revisionHistory" where article_id = {articleIndex[0]} order by date DESC;"""
+            row = dataAccess.freeDatabaseAccess(textQuery)
+            print(row)
+            if row[0][1]:
+                newQuote = QuoteScore(row[0][1])
+                (inQuoteScore, nonQuoteScore) = newQuote.quoteScore()
+                updateQuery = f"""update "article" set quotescore = {inQuoteScore}, nonquotescore = {nonQuoteScore} where id = {articleIndex[0]};"""
+                dataAccess.freeCommitDatabaseAccess(updateQuery)
+                print(updateQuery)
 
 # testing = wdb.DatabaseAccess()
 # query = f"""select date, text from "revisionHistory" where article_id = 1 order by date DESC;"""
