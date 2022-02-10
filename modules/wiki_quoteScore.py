@@ -21,6 +21,8 @@ class QuoteScore:
     def dataCleaning(self):
         self.removePunctuationNum()
         self.quoteDetection()
+        print(self.inQuote)
+        print(self.nonQuote)
         self.quoteCleaning()
 
     def quoteCleaning(self):
@@ -143,13 +145,17 @@ class QuoteScore:
 
 
 testing = wdb.DatabaseAccess()
-# query = f"""select text from "revisionHistory" where article_id = 1;"""
-query = f"""select distinct(id) from "article" limit 5;"""
+query = f"""select text from "revisionHistory" where article_id = 1;"""
+
+
+# query = f"""select distinct(id) from "article" limit 5;"""
+# [(1,), (2,), (6,), (8,), (9,)]
+
 
 row = testing.freeDatabaseAccess(query)
-print(row)
-# newQuote = QuoteScore(row[0][0])
-# print(newQuote.quoteScore())
+# print(row)
+newQuote = QuoteScore(row[0][0])
+print(newQuote.quoteScore())
 
 #select distinct(id) from "article" limit 5;
 
