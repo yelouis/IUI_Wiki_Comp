@@ -149,8 +149,7 @@ if __name__ == "__main__":
         if articleIndex[0] > 23817:
             textQuery = f"""select date, text from "revisionHistory" where article_id = {articleIndex[0]} order by date DESC;"""
             row = dataAccess.freeDatabaseAccess(textQuery)
-            print(row)
-            if row[0][1]:
+            if len(row) > 0:
                 newQuote = QuoteScore(row[0][1])
                 (inQuoteScore, nonQuoteScore) = newQuote.quoteScore()
                 updateQuery = f"""update "article" set quotescore = {inQuoteScore}, nonquotescore = {nonQuoteScore} where id = {articleIndex[0]};"""
