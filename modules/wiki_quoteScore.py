@@ -147,7 +147,7 @@ testing = wdb.DatabaseAccess()
 query = f"""select distinct(id) from "article" limit 5;"""
 
 row = testing.freeDatabaseAccess(query)
-print(row[0])
+print(row)
 # newQuote = QuoteScore(row[0][0])
 # print(newQuote.quoteScore())
 
