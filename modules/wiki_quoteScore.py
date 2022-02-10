@@ -15,7 +15,6 @@ class QuoteScore:
         self.corpus = text
         self.inQuote = []
         self.nonQuote = []
-        self.frequencyDict = {}
         self.dataCleaning()
 
     def dataCleaning(self):
@@ -126,6 +125,7 @@ class QuoteScore:
         frequencyDict = newFrequencyDict
         inQuoteAverageScoreList = []
         nonQuoteAverageScoreList = []
+        print(frequencyDict)
 
         for quoteWord in frequencyDict:
             if quoteWord in frequencyDictInQuote:
