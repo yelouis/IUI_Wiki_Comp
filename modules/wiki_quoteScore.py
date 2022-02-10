@@ -27,7 +27,11 @@ class QuoteScore:
         newInQuote = []
         for word_ele in self.inQuote:
             # Remove words that are stopwords, is a proper noun (by cap), or not in the wordList of NLTK
-            if word_ele.lower() in stopWords or word_ele[0].isupper() or word_ele.lower() not in wordsList:
+            if (
+                word_ele.lower() in stopWords
+                or word_ele[0].isupper()
+                or word_ele.lower() not in wordsList
+            ):
                 continue
             else:
                 newInQuote.append(word_ele.lower())
@@ -35,14 +39,18 @@ class QuoteScore:
 
         newNonQuote = []
         for word_ele in self.nonQuote:
-            if word_ele.lower() in stopWords or word_ele[0].isupper() or word_ele.lower() not in wordsList:
+            if (
+                word_ele.lower() in stopWords
+                or word_ele[0].isupper()
+                or word_ele.lower() not in wordsList
+            ):
                 continue
             else:
                 newNonQuote.append(word_ele.lower())
         self.nonQuote = newNonQuote
 
     def removePunctuationNum(self):
-        punc = '''!()-[]{};:\,<>./?@#$%^&*_~'''
+        punc = """!()-[]{};:\,<>./?@#$%^&*_~"""
         for character in self.corpus:
             if character in punc:
                 self.corpus = self.corpus.replace(character, "")
@@ -53,7 +61,7 @@ class QuoteScore:
             self.corpus = self.corpus.replace(str(i), "")
 
     def quoteDetection(self):
-        quotationMark = "\"\'"
+        quotationMark = "\"'"
         all_words = self.corpus.split(" ")
         quoteStack = []
         openQuote = False
