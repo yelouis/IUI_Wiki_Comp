@@ -32,65 +32,65 @@ class DatabaseAccess:
 
     def foreignKeyJoinByID(self, chosenID):
         query = f"""SELECT * FROM "article" INNER JOIN
-		"revisionHistory" ON "article".id = "revisionHistory".article_id
-		WHERE "article".id = {chosenID}"""
+        "revisionHistory" ON "article".id = "revisionHistory".article_id
+        WHERE "article".id = {chosenID}"""
         chosenQuery = self.cursor.execute(query)
         rows = self.cursor.fetchall()
         return rows
 
     def article_id_join_search(self, chosenID):
         query = f"""SELECT * FROM "article" INNER JOIN
-		"revisionHistory" ON "article".id = "revisionHistory".article_id
-		WHERE "article".id = {chosenID}"""
-		chosenQuery = self.cursor.execute(query)
-		rows = self.cursor.fetchall()
-		return rows
+        "revisionHistory" ON "article".id = "revisionHistory".article_id
+        WHERE "article".id = {chosenID}"""
+        chosenQuery = self.cursor.execute(query)
+        rows = self.cursor.fetchall()
+        return rows
 
-	def title_join_search(self, title):
-		query = f"""SELECT * FROM "article" NATURAL JOIN "revisionHistory" WHERE title = '{title}'"""
-		chosenQuery = self.cursor.execute(query)
-		rows = self.cursor.fetchall()
-		return rows
+    def title_join_search(self, title):
+        query = f"""SELECT * FROM "article" NATURAL JOIN "revisionHistory" WHERE title = '{title}'"""
+        chosenQuery = self.cursor.execute(query)
+        rows = self.cursor.fetchall()
+        return rows
 
-	def addColumnToTable(self, columnName, columnType, tableName):
-		query = f"""ALTER TABLE "{tableName}" ADD {columnName} {columnType}"""
-		chosenQuery = self.cursor.execute(query)
-		self.conn.commit()
-		return chosenQuery
+    def addColumnToTable(self, columnName, columnType, tableName):
+        query = f"""ALTER TABLE "{tableName}" ADD {columnName} {columnType}"""
+        chosenQuery = self.cursor.execute(query)
+        self.conn.commit()
+        return chosenQuery
 
-	def dropColumn(self, columnName, tableName):
-		query = f"""ALTER TABLE "{tableName}" DROP COLUMN {columnName}"""
-		chosenQuery = self.cursor.execute(query)
-		self.conn.commit()
-		return chosenQuery
+    def dropColumn(self, columnName, tableName):
+        query = f"""ALTER TABLE "{tableName}" DROP COLUMN {columnName}"""
+        chosenQuery = self.cursor.execute(query)
+        self.conn.commit()
+        return chosenQuery
 
-	def getArticleAuthors(self, ID):
-		authors = set()
-		revisions = self.article_id_join_search(ID)
-		for revision in revisions:
-			if(revision[11] is not None): # we may be referencing the wrong columns here
-				authors.add(revision[11]) # we think 11 is for a_name
-			elif(revision[12] is not None):
-				authors.add(revision[12]) # we think 12 is for a_ID
-			else:
-				authors.add(revision[13]) # we think 13 is for a_IP
+    def getArticleAuthors(self, ID):
+        authors = set()
+        revisions = self.article_id_join_search(ID)
+        for revision in revisions:
+            if(revision[11] is not None): # we may be referencing the wrong columns here
+                authors.add(revision[11]) # we think 11 is for a_name
+            elif(revision[12] is not None):
+                authors.add(revision[12]) # we think 12 is for a_ID
+            else:
+                authors.add(revision[13]) # we think 13 is for a_IP
 
-	def freeDatabaseAccess(self, query):
-		chosenQuery = self.cursor.execute(query)
-		rows = self.cursor.fetchall()
-		return rows
+    def freeDatabaseAccess(self, query):
+        chosenQuery = self.cursor.execute(query)
+        rows = self.cursor.fetchall()
+        return rows
 
 
 
-	# Update Tutorial
-	#
-	# UPDATE table_name
-	# SET column1 = value1, column2 = value2, ...
-	# WHERE condition;
-	#
-	# UPDATE Customers
-	# SET ContactName = 'Alfred Schmidt', City= 'Frankfurt'
-	# WHERE CustomerID = 1;
+    # Update Tutorial
+    #
+    # UPDATE table_name
+    # SET column1 = value1, column2 = value2, ...
+    # WHERE condition;
+    #
+    # UPDATE Customers
+    # SET ContactName = 'Alfred Schmidt', City= 'Frankfurt'
+    # WHERE CustomerID = 1;
 
 
 
@@ -178,7 +178,7 @@ def populate():
                 try:
                     cur.execute(
                         f"""INSERT INTO public."article" VALUES ({article.id}, $${article.title}$$,
-								{article.current_id}, {num_edits}, {num_unique_authors}, {author_diversity}, {age}, {currency})"""
+                                {article.current_id}, {num_edits}, {num_unique_authors}, {author_diversity}, {age}, {currency})"""
                     )
                 except:
                     print(f"Error adding: {article.title}")
@@ -203,11 +203,11 @@ def populate():
                         try:
                             cur.execute(
                                 f"""INSERT INTO public."revisionHistory" VALUES (
-								{article.revisions[revision].id},
-								$${article.title}$$, {num_internal_links}, {num_external_links},
-								{article_length}, {article.id}, {flesch}, {kincaid}, {num_images},
-								{average_sentence_length},
-								TIMESTAMP '{article.revisions[revision].date}', $${text}$$) """
+                                {article.revisions[revision].id},
+                                $${article.title}$$, {num_internal_links}, {num_external_links},
+                                {article_length}, {article.id}, {flesch}, {kincaid}, {num_images},
+                                {average_sentence_length},
+                                TIMESTAMP '{article.revisions[revision].date}', $${text}$$) """
                             )
                         except:
                             # print(f"Error adding: {article.title}: {revision=}")
