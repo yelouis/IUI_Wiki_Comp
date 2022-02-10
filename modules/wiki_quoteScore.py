@@ -142,7 +142,8 @@ class QuoteScore:
 testing = wdb.DatabaseAccess()
 query = f"""select text from "revisionHistory" where article_id = 1;"""
 row = testing.freeDatabaseAccess(query)
-print(row)
+newQuote = newQuote(row[0][0])
+print(newQuote.quoteScore())
 
 
 # print(newQuote.quoteScore())
