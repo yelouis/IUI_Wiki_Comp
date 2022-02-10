@@ -151,8 +151,7 @@ if __name__ == "__main__":
         newQuote = QuoteScore(row[0][1])
         (inQuoteScore, nonQuoteScore) = newQuote.quoteScore()
         updateQuery = f"""update "article" set quotescore = {inQuoteScore}, nonquotescore = {nonQuoteScore} where id = {articleIndex[0]};"""
-        dataAccess.freeCommitDatabaseAccess(updateQuery)
-        print(articleIndex)
+        print(dataAccess.freeCommitDatabaseAccess(updateQuery))
 
 # testing = wdb.DatabaseAccess()
 # query = f"""select date, text from "revisionHistory" where article_id = 1 order by date DESC;"""
