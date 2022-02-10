@@ -39,6 +39,7 @@ class QuoteScore:
 
         newNonQuote = []
         for word_ele in self.nonQuote:
+            print(word_ele)
             if (
                 word_ele.lower() in stopWords
                 or word_ele[0].isupper()
@@ -145,6 +146,9 @@ row = testing.freeDatabaseAccess(query)
 print(row[0])
 newQuote = QuoteScore(row[0][0])
 print(newQuote.quoteScore())
+
+# newQuote = QuoteScore("""positive number, the number of documents to select; when used with by, the number to select from each group or a vector equal in length to the number of groups defining the samples to be chosen in each category of by. By defining a size larger than the number of documents, it is possible to oversample when""")
+# print(newQuote.quoteScore())
 
 
 # print(newQuote.quoteScore())
