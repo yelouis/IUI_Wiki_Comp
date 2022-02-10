@@ -120,7 +120,7 @@ class QuoteScore:
         frequencyDictNonQuote = Counter(self.nonQuote)
         newFrequencyDict = {}
         for word in frequencyDict:
-            if frequencyDict[word] >= 2:
+            if frequencyDict[word] >= 1:
                 newFrequencyDict[word] = frequencyDict[word]
         frequencyDict = newFrequencyDict
         inQuoteAverageScoreList = []
