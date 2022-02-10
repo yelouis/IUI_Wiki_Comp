@@ -29,6 +29,7 @@ class QuoteScore:
             # Remove words that are stopwords, is a proper noun (by cap), or not in the wordList of NLTK
             if (
                 word_ele.lower() in stopWords
+                or len(word_ele) == 0
                 or word_ele[0].isupper()
                 or word_ele.lower() not in wordsList
             ):
@@ -39,9 +40,10 @@ class QuoteScore:
 
         newNonQuote = []
         for word_ele in self.nonQuote:
-            print(word_ele)
+            # print(word_ele)
             if (
                 word_ele.lower() in stopWords
+                or len(word_ele) == 0
                 or word_ele[0].isupper()
                 or word_ele.lower() not in wordsList
             ):
