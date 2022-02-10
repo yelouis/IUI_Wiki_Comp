@@ -20,8 +20,6 @@ class QuoteScore:
     def dataCleaning(self):
         self.removePunctuationNum()
         self.quoteDetection()
-        print(self.inQuote)
-        print(self.nonQuote)
         self.quoteCleaning()
 
     def quoteCleaning(self):
@@ -120,12 +118,11 @@ class QuoteScore:
         frequencyDictNonQuote = Counter(self.nonQuote)
         newFrequencyDict = {}
         for word in frequencyDict:
-            if frequencyDict[word] >= 1:
+            if frequencyDict[word] >= 10:
                 newFrequencyDict[word] = frequencyDict[word]
         frequencyDict = newFrequencyDict
         inQuoteAverageScoreList = []
         nonQuoteAverageScoreList = []
-        print(frequencyDict)
 
         for quoteWord in frequencyDict:
             if quoteWord in frequencyDictInQuote:
