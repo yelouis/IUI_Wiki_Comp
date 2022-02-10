@@ -1,17 +1,22 @@
+from collections import Counter
+from statistics import mean
 import psycopg2
+import wiki_db as wdb
+
 with open("../stopwords/english.txt") as f:
     stopWords = f.read().splitlines()
 
 with open("../words/en.txt") as f:
     wordsList = f.read().splitlines()
 
+
 class QuoteScore:
     def __init__(self, text):
         self.corpus = text
         self.inQuote = []
         self.nonQuote = []
-
-
+        self.frequencyDict = {}
+        self.dataCleaning()
 
     def dataCleaning(self):
         self.removePunctuationNum()
@@ -40,6 +45,8 @@ class QuoteScore:
         punc = '''!()-[]{};:\,<>./?@#$%^&*_~'''
         for character in self.corpus:
             if character in punc:
+                self.corpus = self.corpus.replace(character, "")
+            if ord(character) >= 128:
                 self.corpus = self.corpus.replace(character, "")
 
         for i in range(9):
@@ -93,7 +100,41 @@ class QuoteScore:
                     if not openQuote:
                         self.nonQuote.append(stripped_word)
 
-newQuote = QuoteScore("[I]n corpus linguistics quantitative and qualitative methods are extensively used in combination. It is also characteristic of corpus linguistics to begin with quantitative findings, and work toward qualitative ones. But...the procedure may have cyclic elements. Generally it is desirable to subject quantitative results to qualitative scrutiny—attempting to explain why a particular frequency pattern occurs, for example. But on the other hand, qualitative analysis (making use of the investigator's ability to interpret samples of language in context) may be the means for classifying examples in a particular corpus by their meanings; and this qualitative analysis may then be the input to a further quantitative analysis, one based on meaning....")
-newQuote.dataCleaning()
-print(newQuote.inQuote)
-print(newQuote.nonQuote)
+    def quoteScore(self):
+        # print(self.inQuote)
+        # print(self.nonQuote)
+        frequencyDict = Counter(self.inQuote + self.nonQuote)
+        frequencyDictInQuote = Counter(self.inQuote)
+        frequencyDictNonQuote = Counter(self.nonQuote)
+        newFrequencyDict = {}
+        for word in frequencyDict:
+            if frequencyDict[word] >= 2:
+                newFrequencyDict[word] = frequencyDict[word]
+        frequencyDict = newFrequencyDict
+        inQuoteAverageScoreList = []
+        nonQuoteAverageScoreList = []
+
+        for quoteWord in frequencyDict:
+            if quoteWord in frequencyDictInQuote:
+                inQuoteAverageScoreList.append(frequencyDictInQuote[quoteWord]/frequencyDict[quoteWord])
+            if quoteWord in frequencyDictNonQuote:
+                nonQuoteAverageScoreList.append(frequencyDictNonQuote[quoteWord]/frequencyDict[quoteWord])
+
+        inQuoteAverage = 0
+        nonQuoteAverage = 0
+
+        if len(inQuoteAverageScoreList) > 0:
+            inQuoteAverage = mean(inQuoteAverageScoreList)
+        if len(nonQuoteAverageScoreList) > 0:
+            nonQuoteAverage = mean(nonQuoteAverageScoreList)
+
+        return (inQuoteAverage, nonQuoteAverage)
+
+
+testing = wdb.DatabaseAccess()
+query = f"""select text from "revisionHistory" where article_id = 1;"""
+row = testing.freeDatabaseAccess(query)
+print(rows)
+
+
+# print(newQuote.quoteScore())
