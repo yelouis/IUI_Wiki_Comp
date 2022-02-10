@@ -82,7 +82,7 @@ class DatabaseAccess:
 
     def freeCommitDatabaseAccess(self, query):
         chosenQuery = self.cursor.execute(query)
-		self.conn.commit()
+        self.conn.commit()
         return chosenQuery
 
 
