@@ -80,6 +80,10 @@ class DatabaseAccess:
         rows = self.cursor.fetchall()
         return rows
 
+    def freeCommitDatabaseAccess(self, query):
+        chosenQuery = self.cursor.execute(query)
+		self.conn.commit()
+        return
 
 
     # Update Tutorial

@@ -144,18 +144,31 @@ class QuoteScore:
         return (inQuoteAverage, nonQuoteAverage)
 
 
-testing = wdb.DatabaseAccess()
-query = f"""select text from "revisionHistory" where article_id = 1;"""
+if __name__ == "__main__":
+    dataAccess = wdb.DatabaseAccess()
+    articleIndexQuery = f"""select distinct(id) from "article";"""
+    articleIndexList = dataAccess.freeDatabaseAccess(articleIndexQuery)
+    for articleIndex in articleIndexList:
+        textQuery = f"""select date, text from "revisionHistory" where article_id = {articleIndex[0]} order by date DESC;"""
+        row = dataAccess.freeDatabaseAccess(textQuery)
+        newQuote = QuoteScore(row[0][1])
+        (inQuoteScore, nonQuoteScore) = newQuote.quoteScore()
+        updateQuery = f"""update "article" set quotescore = {inQuoteScore}, nonquotescore = {nonQuoteScore} where id = {articleIndex[0]};"""
+        dataAccess.freeCommitDatabaseAccess(updateQuery)
+        print(articleIndex)
 
-
-# query = f"""select distinct(id) from "article" limit 5;"""
-# [(1,), (2,), (6,), (8,), (9,)]
-
-
-row = testing.freeDatabaseAccess(query)
-# print(row)
-newQuote = QuoteScore(row[0][0])
-print(newQuote.quoteScore())
+# testing = wdb.DatabaseAccess()
+# query = f"""select date, text from "revisionHistory" where article_id = 1 order by date DESC;"""
+#
+#
+# # query = f"""select distinct(id) from "article" limit 5;"""
+# # [(1,), (2,), (6,), (8,), (9,)]
+#
+#
+# row = testing.freeDatabaseAccess(query)
+# # print(row)
+# newQuote = QuoteScore(row[0][0])
+# print(newQuote.quoteScore())
 
 #select distinct(id) from "article" limit 5;
 
