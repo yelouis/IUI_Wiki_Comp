@@ -19,13 +19,17 @@ To reduce computing time, we will instead use the Simple English Wikipedia, a co
 
 `modules`: The brunt of the code
 - `modeling.R`: Backward elimination construction of a generalized linear regression model to predict the likelihood that an article is good.
-- `wiki_analysis.py`:
-- `wiki_db.py`:
-- `wiki_dump.py`:
-- `wiki_quotescore.py`:
-- `wiki_req.py`:
+- `wiki_analysis.py`: Data structures for holding data and metadata for articles and revisions as we process them from the dump
+- `wiki_db.py`: Initializing the database and populating it with data from the dump.
+- `wiki_dump.py`: Data structure and methods for iteratively parsing, processing and storing the XML Wikipedia data. 
+- `wiki_quotescore.py`: Methods for obtaining a quote score for a piece of text.
+- `wiki_req.py`: Methods for accessing the Wikipedia API for pulling data. 
 
 `sql`: Any `psql` scripts used to populate database entries.
+- `complete_author_sum.sql`: Produce a score per article counting the number of times authors that have worked on the article have worked on other articles together.
+- `filtered_author_sum.sql`: Produce a score per article counting the number of times authors that have worked on the article have worked on other articles together *ignoring authors that have only worked together once*.
+- `get_article_densities.sql`: Create a table that stores the number of times a given pair of authors have worked together.
+- `get_author_scores.sql`: Produce a score per article that counts the scores of all the articles that this article's authors have worked on.
 
 `stopwords`:
 - english: A list of English stopwords (high-frequency, ignorable words).
