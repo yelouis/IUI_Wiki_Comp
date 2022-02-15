@@ -1,4 +1,7 @@
+from collections import Counter
+from statistics import mean
 import psycopg2
+import wiki_db as wdb
 
 with open("../stopwords/english.txt") as f:
     stopWords = f.read().splitlines()
@@ -12,6 +15,7 @@ class QuoteScore:
         self.corpus = text
         self.inQuote = []
         self.nonQuote = []
+        self.dataCleaning()
 
     def dataCleaning(self):
         self.removePunctuationNum()
@@ -24,6 +28,7 @@ class QuoteScore:
             # Remove words that are stopwords, is a proper noun (by cap), or not in the wordList of NLTK
             if (
                 word_ele.lower() in stopWords
+                or len(word_ele) == 0
                 or word_ele[0].isupper()
                 or word_ele.lower() not in wordsList
             ):
@@ -34,8 +39,10 @@ class QuoteScore:
 
         newNonQuote = []
         for word_ele in self.nonQuote:
+            # print(word_ele)
             if (
                 word_ele.lower() in stopWords
+                or len(word_ele) == 0
                 or word_ele[0].isupper()
                 or word_ele.lower() not in wordsList
             ):
@@ -48,6 +55,8 @@ class QuoteScore:
         punc = """!()-[]{};:\,<>./?@#$%^&*_~"""
         for character in self.corpus:
             if character in punc:
+                self.corpus = self.corpus.replace(character, "")
+            if ord(character) >= 128:
                 self.corpus = self.corpus.replace(character, "")
 
         for i in range(9):
@@ -101,10 +110,69 @@ class QuoteScore:
                     if not openQuote:
                         self.nonQuote.append(stripped_word)
 
+    def quoteScore(self):
+        # print(self.inQuote)
+        # print(self.nonQuote)
+        frequencyDict = Counter(self.inQuote + self.nonQuote)
+        frequencyDictInQuote = Counter(self.inQuote)
+        frequencyDictNonQuote = Counter(self.nonQuote)
+        newFrequencyDict = {}
+        for word in frequencyDict:
+            if frequencyDict[word] >= 5:
+                newFrequencyDict[word] = frequencyDict[word]
+        frequencyDict = newFrequencyDict
+        inQuoteAverageScoreList = []
+        nonQuoteAverageScoreList = []
 
-newQuote = QuoteScore(
-    "[I]n corpus linguistics quantitative and qualitative methods are extensively used in combination. It is also characteristic of corpus linguistics to begin with quantitative findings, and work toward qualitative ones. But...the procedure may have cyclic elements. Generally it is desirable to subject quantitative results to qualitative scrutiny—attempting to explain why a particular frequency pattern occurs, for example. But on the other hand, qualitative analysis (making use of the investigator's ability to interpret samples of language in context) may be the means for classifying examples in a particular corpus by their meanings; and this qualitative analysis may then be the input to a further quantitative analysis, one based on meaning...."
-)
-newQuote.dataCleaning()
-print(newQuote.inQuote)
-print(newQuote.nonQuote)
+        for quoteWord in frequencyDict:
+            if quoteWord in frequencyDictInQuote:
+                inQuoteAverageScoreList.append(frequencyDictInQuote[quoteWord]/frequencyDict[quoteWord])
+            if quoteWord in frequencyDictNonQuote:
+                nonQuoteAverageScoreList.append(frequencyDictNonQuote[quoteWord]/frequencyDict[quoteWord])
+
+        inQuoteAverage = 0
+        nonQuoteAverage = 0
+
+        if len(inQuoteAverageScoreList) > 0:
+            inQuoteAverage = mean(inQuoteAverageScoreList)
+        if len(nonQuoteAverageScoreList) > 0:
+            nonQuoteAverage = mean(nonQuoteAverageScoreList)
+
+        return (inQuoteAverage, nonQuoteAverage)
+
+
+if __name__ == "__main__":
+    dataAccess = wdb.DatabaseAccess()
+    articleIndexQuery = f"""select distinct(id) from "article";"""
+    articleIndexList = dataAccess.freeDatabaseAccess(articleIndexQuery)
+    for articleIndex in articleIndexList:
+        if articleIndex[0] > 23817:
+            textQuery = f"""select date, text from "revisionHistory" where article_id = {articleIndex[0]} order by date DESC;"""
+            row = dataAccess.freeDatabaseAccess(textQuery)
+            if len(row) > 0:
+                newQuote = QuoteScore(row[0][1])
+                (inQuoteScore, nonQuoteScore) = newQuote.quoteScore()
+                updateQuery = f"""update "article" set quotescore = {inQuoteScore}, nonquotescore = {nonQuoteScore} where id = {articleIndex[0]};"""
+                dataAccess.freeCommitDatabaseAccess(updateQuery)
+                print(updateQuery)
+
+# testing = wdb.DatabaseAccess()
+# query = f"""select date, text from "revisionHistory" where article_id = 1 order by date DESC;"""
+#
+#
+# # query = f"""select distinct(id) from "article" limit 5;"""
+# # [(1,), (2,), (6,), (8,), (9,)]
+#
+#
+# row = testing.freeDatabaseAccess(query)
+# # print(row)
+# newQuote = QuoteScore(row[0][0])
+# print(newQuote.quoteScore())
+
+#select distinct(id) from "article" limit 5;
+
+# newQuote = QuoteScore("""positive number, the number of documents to select; when used with by, the number to select from each group or a vector equal in length to the number of groups defining the samples to be chosen in each category of by. By defining a size larger than the number of documents, it is possible to oversample when""")
+# print(newQuote.quoteScore())
+
+
+# print(newQuote.quoteScore())
