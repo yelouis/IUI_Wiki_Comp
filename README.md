@@ -3,7 +3,7 @@
 
 <p>
 <em>Wikipedia</em><sup><a href="https://www.wikipedia.org/">[1]</a></sup> is a well known and widely used source of information. Wikipedia is massive<sup><a href="https://en.wikipedia.org/wiki/Wikipedia:Size_comparisons#:~:text=Currently%2C%20the%20English%20Wikipedia%20alone,million%20articles%20in%20309%20languages.">[2]</a></sup>,
-and its information is largely crowdsourced. As a result it is impossible<sup><a>[citation needed]</a></sup> to manually evaluate the continuously growing number of articles. Even so, Wikipedia users should be able to check the
+and its information is largely crowdsourced. As a result it is impossible<sup><a href="">[citation needed]</a></sup> to manually evaluate the continuously growing number of articles. Even so, Wikipedia users should be able to check the
 quality/credibility of the articles that they are using. Thus, we propose <strong>Wikiscore</strong>: an automated version of the evaluation process that will give users a quality score and a confidence score for each article they
 want to use.
 </p>
