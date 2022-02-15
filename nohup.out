@@ -24,3 +24,10 @@ WHERE A.article_id = B.article_id AND
       F.autha = A.real_id AND 
       F.authb = B.real_id
 GROUP BY A.article_id;
+SELECT 179112
+UPDATE article SET full_author_density = 0;
+UPDATE 249434
+UPDATE article SET full_author_density = count 
+FROM public."complete_author_sum" A
+WHERE id = A.article_id;
+UPDATE 179112
