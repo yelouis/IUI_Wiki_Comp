@@ -9,8 +9,8 @@ want to use.
 </p>
 <br/>
 <p>
-In order to make the problem tractable for our timeframe, we won't be retrieving articles from Wikipedia itself. The main, English version of Wikipedia sports over 6 million articles<sup><a href="https://en.wikipedia.org/wiki/Wikipedia:Size_comparisons#:~:text=Currently%2C%20the%20English%20Wikipedia%20alone,million%20articles%20in%20309%20languages.">2</a></sup>.
-To reduce computing time, we will instead use the Simple English Wikipedia, a condensed and simplified version of Wikipedia, that contains just over 200,000 articles<sup><a href="https://en.wikipedia.org/wiki/Simple_English_Wikipedia">3</a></sup>.
+In order to make the problem tractable for our timeframe, we won't be retrieving articles from Wikipedia itself. The main, English version of Wikipedia sports over 6 million articles<sup><a href="https://en.wikipedia.org/wiki/Wikipedia:Size_comparisons#:~:text=Currently%2C%20the%20English%20Wikipedia%20alone,million%20articles%20in%20309%20languages.">3</a></sup>.
+To reduce computing time, we will instead use the Simple English Wikipedia, a condensed and simplified version of Wikipedia, that contains just over 200,000 articles<sup><a href="https://en.wikipedia.org/wiki/Simple_English_Wikipedia">4</a></sup>.
 </p>
 
 ## Documentation
