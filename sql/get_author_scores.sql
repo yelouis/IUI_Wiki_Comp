@@ -5,20 +5,20 @@ FROM public."article" A LEFT OUTER JOIN public."article_quality" Q
 ON A.title = Q.name;
 
 CREATE TABLE author_scores AS
-SELECT rev.real_id, SUM(Q.score)
-FROM public."revisionHistory" rev, public."article" A, public."complete_article_quality" Q
-WHERE rev.article_id = A.id AND A.title = Q.title
+SELECT rev.real_id, SUM(A.article_quality), COUNT(*)
+FROM public."revisionHistory" rev, public."article" A
+WHERE rev.article_id = A.id
 GROUP BY rev.real_id;
 
 CREATE TABLE article_author_scores AS 
-SELECT rev.article_id, SUM(Q.sum)
-FROM public."revisionHistory" rev, public."author_scores" Q
+SELECT rev.article_id, (SUM(Q.sum) - rev.article_quality) / SUM(Q.count) as score
+FROM public."revisionHistory" rev, author_scores Q
 WHERE rev.real_id = Q.real_id
-GROUP BY rev.article_id;
+GROUP BY rev.article_id, rev.article_quality;
 
 ALTER TABLE article ADD author_score = REAL;
 
-UPDATE article SET author_score = sum
+UPDATE article SET author_score = score
 FROM public."article_author_scores" S
 WHERE id = s.article_id;
 
