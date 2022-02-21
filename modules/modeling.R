@@ -61,7 +61,7 @@ total <- articles %>%
          article_quality = as.factor(article_quality)) %>%
   drop_na(min_len)
 
-total_no_out <- total[-c(249313,175312, 228643), ] %>%
+total_no_out <- total %>%
   mutate(
     lmedian_nil = log(median_nil + 1),
     lmedian_nel = log(median_nel + 1),
@@ -135,43 +135,34 @@ summary(total.glm)
 total.glm.red1 <- update(total.glm, . ~ . - lmin_kincaid)
 summary(total.glm.red1)
 
-total.glm.red2 <- update(total.glm.red1, . ~ . - lmin_nel - lmin_nil - lmedian_nel)
+total.glm.red2 <- update(total.glm.red1, . ~ . - lmin_nel - lmin_nil - lmedian_nel - lmedian_nil)
 summary(total.glm.red2)
 
 total.glm.red3 <- update(total.glm.red2, . ~ . - lquotescore)
 summary(total.glm.red3)
 
-total.glm.red4 <- update(total.glm.red3, . ~ . - lnum_edits)
+total.glm.red4 <- update(total.glm.red3, . ~ . - lnum_unique_authors)
 summary(total.glm.red4)
 
-total.glm.red5 <- update(total.glm.red4, . ~ . - lmax_num_im)
+total.glm.red5 <- update(total.glm.red4, . ~ . - lmax_num_im - lmedian_num_im - lmin_num_im)
 summary(total.glm.red5)
 
 total.glm.red6 <- update(total.glm.red5, . ~ . - lfull_author_density)
 summary(total.glm.red6)
 
-total.glm.red7 <- update(total.glm.red6, . ~ . - lnonquotescore)
+total.glm.red7 <- update(total.glm.red6, . ~ . - lmin_len)
 summary(total.glm.red7)
 
-total.glm.red8 <- update(total.glm.red7, . ~ . - lmin_len)
+total.glm.red8 <- update(total.glm.red7, . ~ . - lnonquotescore - lmin_asl - lmax_nil)
 summary(total.glm.red8)
-
-total.glm.red9 <- update(total.glm.red8, . ~ . - lmin_asl)
-summary(total.glm.red9)
-
-total.glm.red10 <- update(total.glm.red9, . ~ . - lmin_num_im - lmedian_num_im)
-summary(total.glm.red10)
-
-total.glm.red11 <- update(total.glm.red10, . ~ . - lmedian_len) 
-summary(total.glm.red11)
 
 pdf("resids1.pdf")
 par(mfrow = c(2, 2))
-plot(total.glm.red11)
+plot(total.glm.red8)
 dev.off()
 
 total_no_out <- total_no_out %>% 
-  mutate(model_score = log(fitted.values(total.glm.red11)))
+  mutate(model_score = log(fitted.values(total.glm.red8)))
 
 model_scores <- total_no_out %>% pull(model_score) %>% as.numeric()
 ids <- total_no_out %>% pull(id) %>% as.integer()
@@ -183,17 +174,16 @@ for (i in 1:nrow(total_no_out)) {
 
 library(caret)
 pdf("varimp.pdf")
-rownames_to_column(as.data.frame(varImp(total.glm.red11)), "metric") %>%
+rownames_to_column(as.data.frame(varImp(total.glm.red8)), "metric") %>%
   mutate(metric =
-  c("(Log) Median No. of Internal Links",
+  c("(Log) Median Length",
     "(Log) Median Kincaid",
     "(Log) Median Average\n Sentence Length",
-    "(Log) Min No. of\n Internal Links",
-    "(Log) Max No. of\n External Links",
+    "(Log) Max No. of\n Internal Links",
     "(Log) Max Length",
     "(Log) Max Kincaid",
     "(Log) Max Average\n Sentence Length",
-    "(Log) No. Unique Authors",
+    "(Log) No. Edits",
     "(Log) Age",
     "(Log) Currency",
     "Author Score",
