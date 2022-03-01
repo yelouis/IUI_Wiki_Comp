@@ -3,9 +3,11 @@ from statistics import mean
 import psycopg2
 import wiki_db as wdb
 
+# Reads in stopwords
 with open("../stopwords/english.txt") as f:
     stopWords = f.read().splitlines()
 
+# Read in an English dictionary of recognizable words
 with open("../words/en.txt") as f:
     wordsList = f.read().splitlines()
 
@@ -17,15 +19,17 @@ class QuoteScore:
         self.nonQuote = []
         self.dataCleaning()
 
+    # Overall function that cleans and finds quotations
     def dataCleaning(self):
         self.removePunctuationNum()
         self.quoteDetection()
         self.quoteCleaning()
 
+    # Remove words that are stopwords, is a proper noun (by cap), or not in the wordList of NLTK
+    # Stores quote words in self.inQuote and nonquote words in self.nonQuote
     def quoteCleaning(self):
         newInQuote = []
         for word_ele in self.inQuote:
-            # Remove words that are stopwords, is a proper noun (by cap), or not in the wordList of NLTK
             if (
                 word_ele.lower() in stopWords
                 or len(word_ele) == 0
@@ -39,7 +43,6 @@ class QuoteScore:
 
         newNonQuote = []
         for word_ele in self.nonQuote:
-            # print(word_ele)
             if (
                 word_ele.lower() in stopWords
                 or len(word_ele) == 0
@@ -51,6 +54,7 @@ class QuoteScore:
                 newNonQuote.append(word_ele.lower())
         self.nonQuote = newNonQuote
 
+    # Removes punctuation
     def removePunctuationNum(self):
         punc = """!()-[]{};:\,<>./?@#$%^&*_~"""
         for character in self.corpus:
@@ -62,6 +66,7 @@ class QuoteScore:
         for i in range(9):
             self.corpus = self.corpus.replace(str(i), "")
 
+    # Finds words within quotes and outside of quotes.
     def quoteDetection(self):
         quotationMark = "\"'"
         all_words = self.corpus.split(" ")
@@ -110,9 +115,9 @@ class QuoteScore:
                     if not openQuote:
                         self.nonQuote.append(stripped_word)
 
+    # Calculates the overall quote score for things within quotes and things outside of quotes.
+    # Averages them for a final score
     def quoteScore(self):
-        # print(self.inQuote)
-        # print(self.nonQuote)
         frequencyDict = Counter(self.inQuote + self.nonQuote)
         frequencyDictInQuote = Counter(self.inQuote)
         frequencyDictNonQuote = Counter(self.nonQuote)
@@ -141,6 +146,7 @@ class QuoteScore:
         return (inQuoteAverage, nonQuoteAverage)
 
 
+# Pushes quote score into the database
 if __name__ == "__main__":
     dataAccess = wdb.DatabaseAccess()
     articleIndexQuery = f"""select distinct(id) from "article";"""
@@ -155,24 +161,3 @@ if __name__ == "__main__":
                 updateQuery = f"""update "article" set quotescore = {inQuoteScore}, nonquotescore = {nonQuoteScore} where id = {articleIndex[0]};"""
                 dataAccess.freeCommitDatabaseAccess(updateQuery)
                 print(updateQuery)
-
-# testing = wdb.DatabaseAccess()
-# query = f"""select date, text from "revisionHistory" where article_id = 1 order by date DESC;"""
-#
-#
-# # query = f"""select distinct(id) from "article" limit 5;"""
-# # [(1,), (2,), (6,), (8,), (9,)]
-#
-#
-# row = testing.freeDatabaseAccess(query)
-# # print(row)
-# newQuote = QuoteScore(row[0][0])
-# print(newQuote.quoteScore())
-
-#select distinct(id) from "article" limit 5;
-
-# newQuote = QuoteScore("""positive number, the number of documents to select; when used with by, the number to select from each group or a vector equal in length to the number of groups defining the samples to be chosen in each category of by. By defining a size larger than the number of documents, it is possible to oversample when""")
-# print(newQuote.quoteScore())
-
-
-# print(newQuote.quoteScore())
