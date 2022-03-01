@@ -65,7 +65,7 @@
             <!-- Navbar End -->
 
 
-            <!-- Sale & Revenue Start -->
+            <!-- Icons & averages Start -->
             <div class="container-fluid pt-4 px-4">
                 <div class="row g-4">
                     <div class="col-sm-6 col-xl-3">
@@ -106,7 +106,7 @@
                     </div>
                 </div>
             </div>
-            <!-- Sale & Revenue End -->
+            <!-- Icons & averages End -->
 
 
             <!-- Table Start -->
@@ -123,6 +123,7 @@
                                     <th scope="col">Value</th>
                                 </tr>
                             </thead>
+                            <!-- input the data pulled from the database by flask to display on the webpage -->
                             <tbody>
                                 {% for data in article_data %}
                                   <tr>
@@ -193,6 +194,7 @@
                                     <th scope="col">Value</th>
                                 </tr>
                             </thead>
+                            <!-- input the data pulled from the database by flask to display on the webpage -->
                             <tbody>
                                 {% for data in revision_data %}
                                   <tr>
@@ -283,17 +285,9 @@
     <script src="{{url_for('static', filename='lib/tempusdominus/js/moment-timezone.min.js')}}"></script>
     <script src="{{url_for('static', filename='lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js')}}"></script>
 
-    <!-- <script src="lib/chart/chart.min.js"></script>
-    <script src="lib/easing/easing.min.js"></script>
-    <script src="lib/waypoints/waypoints.min.js"></script>
-    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
-    <script src="lib/tempusdominus/js/moment.min.js"></script>
-    <script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
-    <script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script> -->
-
     <!-- Template Javascript -->
     <script src="{{url_for('static', filename='js/main.js')}}"></script>
-    <!-- <script src="js/main.js"></script> -->
+
 </body>
 
 </html>

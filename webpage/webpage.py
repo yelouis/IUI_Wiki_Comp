@@ -26,22 +26,19 @@ def my_form_post():
 	global r_data
 	if request.form['submit_button'] == "Search Article":
 		text = request.form['article_input']
-		# text = request.form['article']
-
 		processed_text = text.upper()
-		# when we pull article by title, do API disambiguation, then if there's
-		# only 1 option, pass that as parameter to psycopg2, otherwise, pass first option?
 		a_data = access.pullArticleByID(processed_text)
+		# relaod the webpage with the updated information that was pulled from access
 		return render_template("index.html", article_data=a_data, revision_data=r_data)
 
 	elif request.form['submit_button'] == "Search Revision":
-		# text = request.form['revision']
 		text = request.form['revision_input']
 		processed_text = text.upper()
-
 		r_data = access.pullRevisionByID(processed_text)
+		# relaod the webpage with the updated information that was pulled from access
 		return render_template("index.html", article_data=a_data, revision_data=r_data)
 
+	# relaod the webpage with no new information
 	return render_template("home.html")
 
 if __name__ == "__main__":
