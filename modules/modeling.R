@@ -61,6 +61,8 @@ total <- articles %>%
          article_quality = as.factor(article_quality)) %>%
   drop_na(min_len)
 
+# Log-transform most scores (otherwise the coefficients are tiny)
+# And the model is terrible
 total_no_out <- total %>%
   mutate(
     lmedian_nil = log(median_nil + 1),
@@ -129,6 +131,9 @@ lform <- gvg ~ lmedian_nil +
                lnonquotescore
 
 # generalized linear regression model
+# created from backwards elimination
+# not shown here is forward selection 
+# (which was used to ensure adding variables actually made the model "better")
 total.glm <- glm(lform, data = total_no_out, family = "binomial")
 summary(total.glm)
 
@@ -161,17 +166,20 @@ par(mfrow = c(2, 2))
 plot(total.glm.red8)
 dev.off()
 
+# using the final model, store our model scores
 total_no_out <- total_no_out %>% 
   mutate(model_score = log(fitted.values(total.glm.red8)))
 
 model_scores <- total_no_out %>% pull(model_score) %>% as.numeric()
 ids <- total_no_out %>% pull(id) %>% as.integer()
 
+# propogate PSQL database with model scores
 for (i in 1:nrow(total_no_out)) {
   statement = paste0("UPDATE public.article SET model_score = ", format(model_scores[i], digits = 10), " WHERE id = ", ids[i])
   dbExecute(con, statement)
 }
 
+# plot of variable importance
 library(caret)
 pdf("varimp.pdf")
 rownames_to_column(as.data.frame(varImp(total.glm.red8)), "metric") %>%

@@ -7,6 +7,8 @@ import textstat
 
 import wiki_req as wr
 
+# Globals for parsing text
+
 SYMBOL_REGEX = "[\[\]\(\)',`~=\n\*\+\\\/$%&\^\*]"
 
 IMAGE_REGEX = "\[\[.*\]\]"
@@ -14,6 +16,8 @@ IMAGE_REGEX = "\[\[.*\]\]"
 CATEGORY_REGEX = "Category:"
 
 LINK_REGEX = "((http|https)?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)"
+
+# Scores calculate per A-rticle/R-evision
 
 A_SCORES = ["num_edits", "num_unique_authors", "author_diversity", "age", "currency"]
 R_SCORES = [
@@ -25,12 +29,12 @@ R_SCORES = [
     "average_sentence_length",
 ]
 
-
+# Data structure to hold essential article information from XML dump
 class WikipediaArticle:
-    id: int = -1
-    title: str = "N/A"
-    current_id: int = -1
-    first_id: int = -1
+    id: int = -1 # article ID (different from revision IDs)
+    title: str = "N/A" 
+    current_id: int = -1 # most recent revision ID
+    first_id: int = -1 # least recent revision ID
     ns: int = -1  # namespace
     revisions: dict[int, WikipediaRevision]
     notext: int = 0  # number of revisions with no text
@@ -53,18 +57,21 @@ class WikipediaArticle:
     def __str__(self):
         return f"{self.id}, {self.title}, {self.current_id}, {len(self.revisions)}, {self.notext},\n"
 
+    # Returns the WikipediaRevision object associated with the current_id
     def get_current_revision(self) -> Optional[WikipediaRevision]:
         current_revision = self.revisions.get(self.current_id)
         if current_revision:
             return current_revision
         return None
 
+    # Returns the score (if any) associated with the given name
     def get_score(self, score_name: str) -> Optional[Union[int, float]]:
         score = self.scores.get(score_name)
         if score:
             return score
         return None
 
+    # Can be called upon the article being propogated with data
     def calculate_scores(self):
         self.author_scores()
         self.article_age()
@@ -73,6 +80,7 @@ class WikipediaArticle:
         for revision in self.revisions.values():
             revision.calculate_scores()
 
+    # Calculate basic scores from revision history
     def author_scores(self):
         if len(self.revisions) > 0:
             authors = set()
@@ -81,6 +89,8 @@ class WikipediaArticle:
             self.scores["num_unique_authors"] = len(authors)
             self.scores["author_diversity"] = len(authors) / len(self.revisions)
 
+    # Calculate the article age from the most recent revision
+    # to the least recent
     def article_age(self):
         if len(self.revisions) > 0:
             now = datetime.now()
@@ -90,16 +100,16 @@ class WikipediaArticle:
             self.scores["age"] = (now - first_revision.date).days
             self.scores["currency"] = (now - current_revision.date).days
 
-
+# Data structure to hold essential revision information from XML dump
 class WikipediaRevision:
-    id: int = -1
-    date: datetime = datetime(1970, 1, 1)
-    scores: dict[str, float]
+    id: int = -1 # revision ID (different from article ID)
+    date: datetime = datetime(1970, 1, 1) # date the revision was posted
+    scores: dict[str, float] 
     author_name: str = "N/A"
     author_id: int = -1
     author_ip: str = "N/A"
-    raw_text: str = "N/A"
-    text: str = "N/A"
+    raw_text: str = "N/A" # raw unprocessed text of article
+    text: str = "N/A" # processed text
 
     def __init__(self, article: WikipediaArticle = None, id: int = None):
         self.scores = {}
@@ -112,6 +122,7 @@ class WikipediaRevision:
         # TODO: Add self.text to the end, add all the scores to the end
         return f"{self.id}, {self.date}, {self.author_name}, {self.author_id},\n"
 
+    # remove all the bad stuff that might be in wiki markup language
     def process_text(self):
         wikicode = mw.parse(self.raw_text)
         stripped1 = wikicode.strip_code()  # removes [[page | word]] pairs and [[words]]
@@ -125,33 +136,41 @@ class WikipediaRevision:
         )  # puts space in CacciaMagazineOttobre2020 Caccia Magazine Ottobre 2020
         self.text = re.sub(CATEGORY_REGEX, " ", stripped5)  # removes Category:
 
+    # Returns the score (if any) associated with the given name
     def get_score(self, score_name: str) -> Optional[float]:
         score = self.scores.get(score_name)
         if score:
             return score
         return -1
 
+    # Can be called upon the revision being propogated with data
     def calculate_scores(self):
         self.internal_links()
         self.external_links()
         self.num_images()
         self.textstat_scores()
 
+    # Based on the structure of links in WML
+    # identifies all internal links (to other Wikipedia articles)
     def internal_links(self):
         if self.raw_text != "N/A":
             i_links = re.findall("\[\[.+|.+\]\]", self.raw_text)
             self.scores["num_internal_links"] = len(i_links)
 
+    # Identifies any actual links
     def external_links(self):
         if self.raw_text != "N/A":
             i_links = re.findall(LINK_REGEX, self.raw_text)
             self.scores["num_external_links"] = len(i_links)
 
+    # Based on structure of images in WML
+    # identifies all images
     def num_images(self):
         if self.raw_text != "N/A":
             images = re.findall("\[\[Image:.*\]\]", self.raw_text)
             self.scores["num_images"] = len(images)
 
+    # Calculate basic text scores from the processed text
     def textstat_scores(self):
         if self.text != "N/A":
             self.scores["flesch"] = textstat.flesch_reading_ease(self.text)

@@ -4,7 +4,9 @@ from typing import Optional
 import time
 import wiki_dump as wd
 
-
+# Data structure that enables easy access
+# to our PSQL database
+# Methods are self-explanatory
 class DatabaseAccess:
     conn: Optional[psycopg2.connection] = None
     cursor: Optional[psycopg2.cursor] = None
@@ -85,19 +87,6 @@ class DatabaseAccess:
         self.conn.commit()
         return chosenQuery
 
-
-    # Update Tutorial
-    #
-    # UPDATE table_name
-    # SET column1 = value1, column2 = value2, ...
-    # WHERE condition;
-    #
-    # UPDATE Customers
-    # SET ContactName = 'Alfred Schmidt', City= 'Frankfurt'
-    # WHERE CustomerID = 1;
-
-
-
 def add_columns():
     testing = DatabaseAccess()
 
@@ -113,6 +102,9 @@ def add_columns():
 
     inserts = {1}  # dummy dict for while loop start
 
+    # parse pages from the XML dump 
+    # retrieving author name, id, and IP
+    # which were not all initially retrieved
     while len(inserts) > 0:
         parse_start = time.perf_counter()
         inserts = wiki_dump.parse_n_pages(amount)
@@ -157,21 +149,17 @@ def populate():
         "../dumps/simplewiki-latest-pages-meta-history.xml.bz2"
     )
 
-    # # Iterate past previously added values
-    # parse_start = time.perf_counter()
-    # count = wiki_dump.iterate_past_page("")
-    # parse_end = time.perf_counter()
-    # print(f"{parse_end - parse_start} seconds to iterate past {count} articles.")
-
     amount = 10
     num_commits = 0
 
     inserts = {1}  # dummy dict for while loop start
 
+    # Parse pages from XML dump and populate PSQL database with results
     while len(inserts) > 0:
         parse_start = time.perf_counter()
         inserts = wiki_dump.parse_n_pages(amount)
         for article in inserts.values():
+            # retrieve article level scores
             num_edits = article.get_score("num_edits")
             num_unique_authors = article.get_score("num_unique_authors")
             author_diversity = article.get_score("author_diversity")
@@ -186,6 +174,8 @@ def populate():
                     )
                 except:
                     print(f"Error adding: {article.title}")
+
+                # populate revision history with revision level scores
                 for revision in article.revisions:
                     text = article.revisions[revision].text
                     article_length = len(text)
@@ -203,6 +193,7 @@ def populate():
                         "average_sentence_length"
                     )
 
+                    # ensure the revision is well-formatted before committing
                     if article.revisions[revision].id != -1:
                         try:
                             cur.execute(
