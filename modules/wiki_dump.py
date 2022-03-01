@@ -30,6 +30,9 @@ class XMLDumpParser:
         if self.bz2_dump is not None:
             self.bz2_dump.close()
 
+    # iterates the XML context until a <page>
+    # object with the corresponding `page_title` is found
+    # SIDE EFFECT: iterates xml_context
     def iterate_past_page(self, page_title: str) -> int:
         count = 0
         for event, elem in self.xml_context:
@@ -58,6 +61,9 @@ class XMLDumpParser:
 
         return -1
 
+    # parses n pages 
+    # outputs the information to CSV
+    # SIDE EFFECT: iterates xml context
     def write_n_pages_to_csv(self, r_folder: str, filename: str, n: int) -> bool:
         articles = self.parse_n_pages(n)
         try:
@@ -273,7 +279,7 @@ class XMLDumpParser:
 
         return username, id, ip
 
-
+# test parse 10 pages from XML
 def main():
     DUMP_FILE = "../dumps/simplewiki-latest-pages-meta-history.xml.bz2"
 
