@@ -1,4 +1,5 @@
 import stopwords as sw
+import numpy as np
 
 # Revisions is expected to be an array of revision texts where the 0th entry is the oldest revision
 # and the nth entry is the latest revision
@@ -7,7 +8,6 @@ import stopwords as sw
 def create_doc_word_mtx(revisions):
     unique_words = []
     processed_revisions = []
-    doc_word_mtx = []
     # Generate unique wordlist
     for revision in revisions:
         processed_revision = sw.remove_stopwords(revision)
@@ -15,20 +15,15 @@ def create_doc_word_mtx(revisions):
         for word in processed_revision:
             if word not in unique_words:
                 unique_words.append(word)
-
     # Initialize doc_word to 0
-    for i in len(processed_revisions):
-        for j in len(unique_words):
-            doc_word_mtx[i][j] = 0
-
-    doc_counter = 0
-    for processed_revision in processed_revisions:
-        word_counter = 0
-        for unique in unique_words:
-            for word in processed_revision:
-                if word == unique:
-                    doc_word_mtx[doc_counter][word_counter] += 1
-            word_counter += 1
+    doc_word_mtx = np.zeros((len(processed_revisions), len(unique_words)))
+    for i in range(0, len(processed_revisions)):
+        for j in range(0, len(unique_words)):
+            curr_unique = unique_words[j]
+            revision = processed_revisions[i]
+            for word in revision:
+                if word == curr_unique:
+                    doc_word_mtx[i][j] += 1
 
     return doc_word_mtx
 
@@ -36,7 +31,7 @@ def create_doc_word_mtx(revisions):
 # Calculate the difference between two document rows
 def calculate_adjacent_score(doc1, doc2):
     total_diff = 0
-    for i in len(doc1):
+    for i in range(0, len(doc1)):
         total_diff += abs(doc1[i] - doc2[i])
 
     return total_diff
@@ -70,4 +65,4 @@ def find_largest_change(doc_word_mtx):
             greatest_change = (curr, next)
         curr -= 1
         next -= 1
-    return greatest_change
+    return (greatest_change, max)
