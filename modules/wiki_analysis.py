@@ -19,7 +19,8 @@ LINK_REGEX = "((http|https)?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)"
 
 # Scores calculate per A-rticle/R-evision
 
-A_SCORES = ["num_edits", "num_unique_authors", "author_diversity", "age", "currency"]
+A_SCORES = ["num_edits", "num_unique_authors",
+            "author_diversity", "age", "currency"]
 R_SCORES = [
     "num_internal_links",
     "num_external_links",
@@ -30,11 +31,13 @@ R_SCORES = [
 ]
 
 # Data structure to hold essential article information from XML dump
+
+
 class WikipediaArticle:
-    id: int = -1 # article ID (different from revision IDs)
-    title: str = "N/A" 
-    current_id: int = -1 # most recent revision ID
-    first_id: int = -1 # least recent revision ID
+    id: int = -1  # article ID (different from revision IDs)
+    title: str = "N/A"
+    current_id: int = -1  # most recent revision ID
+    first_id: int = -1  # least recent revision ID
     ns: int = -1  # namespace
     revisions: dict[int, WikipediaRevision]
     notext: int = 0  # number of revisions with no text
@@ -46,7 +49,8 @@ class WikipediaArticle:
 
         if id is not None:
             self.id = id
-            rvs, self.current_id, parent_id = wr.get_article_properties(self.id)
+            rvs, self.current_id, parent_id = wr.get_article_properties(
+                self.id)
 
             for rv in rvs:
                 self.revisions[rv] = WikipediaRevision(self, rv)
@@ -87,7 +91,8 @@ class WikipediaArticle:
             for revision in self.revisions.values():
                 authors.add(revision.author_id)
             self.scores["num_unique_authors"] = len(authors)
-            self.scores["author_diversity"] = len(authors) / len(self.revisions)
+            self.scores["author_diversity"] = len(
+                authors) / len(self.revisions)
 
     # Calculate the article age from the most recent revision
     # to the least recent
@@ -101,15 +106,17 @@ class WikipediaArticle:
             self.scores["currency"] = (now - current_revision.date).days
 
 # Data structure to hold essential revision information from XML dump
+
+
 class WikipediaRevision:
-    id: int = -1 # revision ID (different from article ID)
-    date: datetime = datetime(1970, 1, 1) # date the revision was posted
-    scores: dict[str, float] 
+    id: int = -1  # revision ID (different from article ID)
+    date: datetime = datetime(1970, 1, 1)  # date the revision was posted
+    scores: dict[str, float]
     author_name: str = "N/A"
     author_id: int = -1
     author_ip: str = "N/A"
-    raw_text: str = "N/A" # raw unprocessed text of article
-    text: str = "N/A" # processed text
+    raw_text: str = "N/A"  # raw unprocessed text of article
+    text: str = "N/A"  # processed text
 
     def __init__(self, article: WikipediaArticle = None, id: int = None):
         self.scores = {}
@@ -125,7 +132,8 @@ class WikipediaRevision:
     # remove all the bad stuff that might be in wiki markup language
     def process_text(self):
         wikicode = mw.parse(self.raw_text)
-        stripped1 = wikicode.strip_code()  # removes [[page | word]] pairs and [[words]]
+        # removes [[page | word]] pairs and [[words]]
+        stripped1 = wikicode.strip_code()
         stripped2 = re.sub(IMAGE_REGEX, "", stripped1)  # removes [[Image:.*]]
         stripped3 = re.sub(LINK_REGEX, "", stripped2)  # removes links
         stripped4 = re.sub(

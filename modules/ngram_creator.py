@@ -1,5 +1,6 @@
 class ngram_creator:
 
+    # Work through tokens to create ngrams of a certain order
     def create(self, order, transitions):
         frequencyDict = {}
         key = ""
@@ -88,6 +89,7 @@ class ngram_creator:
                 else:
                     key = key[1:] + word
 
+    # Tokenizes the input corpus
     def tokenize(self, corpus):
         for line in corpus:
             for word in line.split():
